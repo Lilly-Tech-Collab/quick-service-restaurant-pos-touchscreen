@@ -1,0 +1,560 @@
+<Window x:Class="RestaurantPOS.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:RestaurantPOS.App"
+        mc:Ignorable="d"
+        Title="Restaurant POS" Height="720" Width="1100" Icon="Assets/transparent.png"
+        Loaded="MainWindow_OnLoaded">
+    <Grid Margin="12,0,12,12">
+        <Grid x:Name="LoginPanel">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Row="1" HorizontalAlignment="Center" Width="320" Margin="0,16">
+                <TextBlock x:Name="RestaurantNameText" Text="Restaurant POS" FontSize="28" FontWeight="Bold" TextAlignment="Center" />
+                <TextBlock Text="Enter PIN" Margin="0,16,0,6" FontWeight="SemiBold" />
+                <PasswordBox x:Name="PinBox" FontSize="20" Height="40">
+                    <PasswordBox.InputScope>
+                        <InputScope>
+                            <InputScope.Names>
+                                <InputScopeName NameValue="Number" />
+                            </InputScope.Names>
+                        </InputScope>
+                    </PasswordBox.InputScope>
+                </PasswordBox>
+                <Button Content="Login" Margin="0,12,0,0" Height="36" Click="LoginButton_OnClick" />
+                <TextBlock x:Name="LoginStatusText" Margin="0,8,0,0" Foreground="DarkRed" TextWrapping="Wrap" />
+            </StackPanel>
+        </Grid>
+
+        <Grid x:Name="OrderPanel" Visibility="Collapsed">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*" />
+                <ColumnDefinition Width="4*" />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Row="0" Grid.ColumnSpan="2" Margin="0,0,0,10">
+                <Border Margin="-12,0,-12,8" BorderBrush="#D0D0D0" BorderThickness="1">
+                    <DockPanel LastChildFill="False">
+                        <Menu DockPanel.Dock="Left">
+                            <MenuItem Header="Menu">
+                                <MenuItem Header="Reports" x:Name="ReportsButton" Click="ReportsButton_OnClick" />
+                                <MenuItem Header="Admin" x:Name="AdminButton" Click="AdminButton_OnClick" />
+                                <MenuItem Header="Logout" Click="LogoutButton_OnClick" />
+                            </MenuItem>
+                        </Menu>
+                        <TextBlock x:Name="LoggedInText" VerticalAlignment="Center" DockPanel.Dock="Right" Margin="0,0,12,0" />
+                    </DockPanel>
+                </Border>
+                <DockPanel>
+                    <TextBlock Text="Order" FontSize="22" FontWeight="Bold" DockPanel.Dock="Left" Margin="0,0,16,0" />
+                </DockPanel>
+            </StackPanel>
+
+            <Grid Grid.Row="1" Grid.Column="0" Margin="0,0,12,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <TextBlock Text="Categories" FontWeight="SemiBold" />
+                <ListBox x:Name="CategoriesList" Grid.Row="1" SelectionChanged="CategoriesList_OnSelectionChanged" DisplayMemberPath="Name" />
+                <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,8,0,0">
+                    <Button Content="Refresh" Click="RefreshMenuButton_OnClick" />
+                </StackPanel>
+            </Grid>
+
+            <Grid Grid.Row="1" Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="3*" />
+                    <ColumnDefinition Width="2*" />
+                </Grid.ColumnDefinitions>
+
+                <Grid Grid.Column="0" Margin="0,0,12,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="Menu Items" FontWeight="SemiBold" />
+                    <Grid Grid.Row="1" Grid.IsSharedSizeScope="True">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0" Margin="0,6,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" SharedSizeGroup="MenuItemName" />
+                                <ColumnDefinition Width="90" SharedSizeGroup="MenuItemPrice" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Item" FontWeight="Bold" />
+                            <TextBlock Grid.Column="1" Text="Price" FontWeight="Bold" TextAlignment="Right" />
+                        </Grid>
+                        <ListBox x:Name="MenuItemsList" Grid.Row="1" SelectionChanged="MenuItemsList_OnSelectionChanged" PreviewMouseLeftButtonUp="MenuItemsList_OnItemTapped">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="4">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" SharedSizeGroup="MenuItemName" />
+                                            <ColumnDefinition Width="90" SharedSizeGroup="MenuItemPrice" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{Binding Name}" />
+                                        <TextBlock Grid.Column="1" Text="{Binding PriceCents}" TextAlignment="Right" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Grid>
+                    <Button Grid.Row="2" Content="Add Item" Margin="0,8,0,0" Height="32" Click="AddItemButton_OnClick" />
+                </Grid>
+
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="Ticket" FontWeight="SemiBold" />
+                    <Grid Grid.Row="1" Grid.IsSharedSizeScope="True">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0" Margin="0,6,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" SharedSizeGroup="TicketItem" />
+                                <ColumnDefinition Width="60" SharedSizeGroup="TicketQty" />
+                                <ColumnDefinition Width="90" SharedSizeGroup="TicketPrice" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Item" FontWeight="Bold" />
+                            <TextBlock Grid.Column="1" Text="Qty" FontWeight="Bold" TextAlignment="Right" />
+                            <TextBlock Grid.Column="2" Text="Price" FontWeight="Bold" TextAlignment="Right" />
+                        </Grid>
+                        <ListBox x:Name="TicketItemsList" Grid.Row="1" SelectionChanged="TicketItemsList_OnSelectionChanged" PreviewMouseLeftButtonUp="TicketItemsList_OnItemTapped">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="4">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" SharedSizeGroup="TicketItem" />
+                                            <ColumnDefinition Width="60" SharedSizeGroup="TicketQty" />
+                                            <ColumnDefinition Width="90" SharedSizeGroup="TicketPrice" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{Binding NameSnapshot}" FontWeight="SemiBold" />
+                                        <TextBlock Grid.Column="1" Text="{Binding Qty}" TextAlignment="Right" />
+                                        <TextBlock Grid.Column="2" Text="{Binding LineTotalCents}" TextAlignment="Right" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Grid>
+                    <Button Grid.Row="2" Content="Remove Item" Margin="0,8,0,0" Height="32" Click="RemoveItemButton_OnClick" />
+                </Grid>
+            </Grid>
+
+            <DockPanel Grid.Row="2" Grid.ColumnSpan="2" Margin="0,12,0,0">
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                    <TextBlock Text="Subtotal: " FontWeight="Bold" FontSize="16" />
+                    <TextBlock x:Name="SubtotalText" Margin="0,0,16,0" FontWeight="Bold" FontSize="16" />
+                    <TextBlock Text="Tax: " FontWeight="Bold" FontSize="16" />
+                    <TextBlock x:Name="TaxText" Margin="0,0,16,0" FontWeight="Bold" FontSize="16" />
+                    <TextBlock Text="Total: " FontWeight="Bold" FontSize="18" />
+                    <TextBlock x:Name="TotalText" FontWeight="Bold" FontSize="18" />
+                </StackPanel>
+                <Button x:Name="PayButton" Content="Pay" Width="120" Height="36" DockPanel.Dock="Right" Click="PayButton_OnClick" />
+            </DockPanel>
+        </Grid>
+
+        <Grid x:Name="PaymentPanel" Visibility="Collapsed">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <TextBlock Text="Payment" FontSize="22" FontWeight="Bold" />
+
+            <StackPanel Grid.Row="1" Margin="0,16,0,0" Width="320">
+                <TextBlock Text="Total Due" FontWeight="SemiBold" />
+                <TextBlock x:Name="PaymentTotalText" FontSize="24" FontWeight="Bold" Margin="0,6,0,12" />
+                <TextBlock Text="Payment Method" FontWeight="SemiBold" />
+                <ComboBox x:Name="PaymentMethodCombo" Height="32" />
+            </StackPanel>
+
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+                <Button Content="Back" Margin="0,0,8,0" Width="100" Click="BackToOrderButton_OnClick" />
+                <Button Content="Confirm Payment" Width="160" Click="ConfirmPaymentButton_OnClick" />
+            </StackPanel>
+        </Grid>
+
+        <Grid x:Name="ReceiptPanel" Visibility="Collapsed">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <TextBlock Text="Receipt" FontSize="22" FontWeight="Bold" />
+
+            <Border Grid.Row="1" Margin="0,16,0,0" BorderBrush="#D0D0D0" BorderThickness="1" Padding="8">
+                <Grid Margin="4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="3*" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                            <TextBlock Text="Order Number: " FontWeight="SemiBold" Width="140" />
+                            <TextBlock x:Name="ReceiptOrderNumberText" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                            <TextBlock Text="User: " FontWeight="SemiBold" Width="140" />
+                            <TextBlock x:Name="ReceiptUserText" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                            <TextBlock Text="Payment Method: " FontWeight="SemiBold" Width="140" />
+                            <TextBlock x:Name="ReceiptPaymentMethodText" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Total: " FontWeight="SemiBold" Width="140" />
+                            <TextBlock x:Name="ReceiptTotalText" FontSize="20" FontWeight="Bold" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1">
+                        <TextBlock Text="Items" FontWeight="SemiBold" />
+                        <Grid Margin="0,6,0,0" Grid.IsSharedSizeScope="True">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0" Margin="0,0,0,4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" SharedSizeGroup="ReceiptItem" />
+                                    <ColumnDefinition Width="60" SharedSizeGroup="ReceiptQty" />
+                                    <ColumnDefinition Width="90" SharedSizeGroup="ReceiptPrice" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Item" FontWeight="Bold" />
+                                <TextBlock Grid.Column="1" Text="Qty" FontWeight="Bold" TextAlignment="Right" />
+                                <TextBlock Grid.Column="2" Text="Price" FontWeight="Bold" TextAlignment="Right" />
+                            </Grid>
+                            <ListBox x:Name="ReceiptItemsList" Grid.Row="1">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="4">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" SharedSizeGroup="ReceiptItem" />
+                                                <ColumnDefinition Width="60" SharedSizeGroup="ReceiptQty" />
+                                                <ColumnDefinition Width="90" SharedSizeGroup="ReceiptPrice" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="{Binding NameSnapshot}" />
+                                            <TextBlock Grid.Column="1" Text="{Binding Qty}" TextAlignment="Right" />
+                                            <TextBlock Grid.Column="2" Text="{Binding LineTotalCents}" TextAlignment="Right" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </Grid>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+                <Button Content="New Order" Width="130" Click="NewOrderButton_OnClick" />
+            </StackPanel>
+        </Grid>
+
+        <Grid x:Name="ReportPanel" Visibility="Collapsed">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <DockPanel LastChildFill="False">
+                <TextBlock Text="Daily Sales" FontSize="22" FontWeight="Bold" DockPanel.Dock="Left" />
+                <DatePicker x:Name="ReportDatePicker" DockPanel.Dock="Right" SelectedDateChanged="ReportDatePicker_OnSelectedDateChanged" />
+            </DockPanel>
+
+            <Border Grid.Row="1" Margin="0,16,0,0" BorderBrush="#D0D0D0" BorderThickness="1" Padding="8">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="3*" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                            <TextBlock Text="Orders: " FontWeight="SemiBold" Width="110" />
+                            <TextBlock x:Name="ReportOrdersText" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                            <TextBlock Text="Total Sales: " FontWeight="SemiBold" Width="110" />
+                            <TextBlock x:Name="ReportTotalSalesText" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                            <TextBlock Text="Cash: " FontWeight="SemiBold" Width="110" />
+                            <TextBlock x:Name="ReportCashText" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                            <TextBlock Text="Card: " FontWeight="SemiBold" Width="110" />
+                            <TextBlock x:Name="ReportCardText" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                            <TextBlock Text="UPI: " FontWeight="SemiBold" Width="110" />
+                            <TextBlock x:Name="ReportUpiText" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Gift: " FontWeight="SemiBold" Width="110" />
+                            <TextBlock x:Name="ReportGiftText" />
+                        </StackPanel>
+                    </StackPanel>
+                    <ScrollViewer Grid.Column="1" HorizontalScrollBarVisibility="Disabled" PanningMode="VerticalOnly" IsDeferredScrollingEnabled="True">
+                        <WrapPanel  ItemHeight="Auto" HorizontalAlignment="Left">
+                            <Border  Margin="0,0,24,24" BorderBrush="#D0D0D0" BorderThickness="1" Padding="8">
+                                <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="Paid Orders" FontWeight="SemiBold" />
+                                    <ListView x:Name="ReportOrdersList" Grid.Row="1" Margin="0,6,0,0" Height="160"  BorderBrush="#D0D0D0" BorderThickness="1" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                    <ListView.View>
+                                        <GridView>
+                                            <GridViewColumn Header="Order" DisplayMemberBinding="{Binding OrderNumber}" Width="80" />
+                                            <GridViewColumn Header="Method" DisplayMemberBinding="{Binding PaymentMethod}" Width="90" />
+                                            <GridViewColumn Header="Total" DisplayMemberBinding="{Binding TotalDisplay}" Width="90" />
+                                            <GridViewColumn Header="Paid At" DisplayMemberBinding="{Binding PaidAtDisplay}" Width="165" />
+                                        </GridView>
+                                    </ListView.View>
+                                </ListView>
+                                </Grid>
+                            </Border>
+
+                            <Border Width="420" Margin="0,0,24,24" BorderBrush="#D0D0D0" BorderThickness="1" Padding="8">
+                                <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="Item Sales" FontWeight="SemiBold" />
+                                <ListView x:Name="ReportItemSalesList" Grid.Row="1" Margin="0,6,0,0" Height="150" BorderBrush="#D0D0D0" BorderThickness="1" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                    <ListView.View>
+                                        <GridView>
+                                            <GridViewColumn Header="Item" DisplayMemberBinding="{Binding ItemName}" Width="260" />
+                                            <GridViewColumn Header="Qty" DisplayMemberBinding="{Binding Quantity}" Width="80" />
+                                        </GridView>
+                                    </ListView.View>
+                                </ListView>
+                                </Grid>
+                            </Border>
+
+                            <Border Width="420" Margin="0,0,24,24" BorderBrush="#D0D0D0" BorderThickness="1" Padding="8">
+                                <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="Category Sales" FontWeight="SemiBold" />
+                                <ListView x:Name="ReportCategorySalesList" Grid.Row="1" Margin="0,6,0,0" Height="150" BorderBrush="#D0D0D0" BorderThickness="1" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                    <ListView.View>
+                                        <GridView>
+                                            <GridViewColumn Header="Category" DisplayMemberBinding="{Binding CategoryName}" Width="190" />
+                                            <GridViewColumn Header="Qty" DisplayMemberBinding="{Binding Quantity}" Width="70" />
+                                            <GridViewColumn Header="Revenue" DisplayMemberBinding="{Binding RevenueDisplay}" Width="120" />
+                                        </GridView>
+                                    </ListView.View>
+                                </ListView>
+                                </Grid>
+                            </Border>
+
+                            <Border Width="420" Margin="0,0,24,24" BorderBrush="#D0D0D0" BorderThickness="1" Padding="8">
+                                <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="Top Items" FontWeight="SemiBold" />
+                                <ListView x:Name="ReportTopItemsList" Grid.Row="1" Margin="0,6,0,0" Height="150" BorderBrush="#D0D0D0" BorderThickness="1" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                    <ListView.View>
+                                        <GridView>
+                                            <GridViewColumn Header="Item" DisplayMemberBinding="{Binding ItemName}" Width="190" />
+                                            <GridViewColumn Header="Qty" DisplayMemberBinding="{Binding Quantity}" Width="70" />
+                                            <GridViewColumn Header="Revenue" DisplayMemberBinding="{Binding RevenueDisplay}" Width="120" />
+                                        </GridView>
+                                    </ListView.View>
+                                </ListView>
+                                </Grid>
+                            </Border>
+
+                            <Border Width="420" Margin="0,0,24,24" BorderBrush="#D0D0D0" BorderThickness="1" Padding="8">
+                                <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="Hourly Sales" FontWeight="SemiBold" />
+                                <ListView x:Name="ReportHourlySalesList" Grid.Row="1" Margin="0,6,0,0" Height="150" BorderBrush="#D0D0D0" BorderThickness="1" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                    <ListView.View>
+                                        <GridView>
+                                            <GridViewColumn Header="Hour" DisplayMemberBinding="{Binding HourLabel}" Width="120" />
+                                            <GridViewColumn Header="Revenue" DisplayMemberBinding="{Binding RevenueDisplay}" Width="140" />
+                                        </GridView>
+                                    </ListView.View>
+                                </ListView>
+                                </Grid>
+                            </Border>
+                        </WrapPanel>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+                <Button Content="Back" Width="110" Click="BackToOrderButton_OnClick" />
+            </StackPanel>
+        </Grid>
+
+        <Grid x:Name="AdminPanel" Visibility="Collapsed">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <TextBlock Text="Admin" FontSize="22" FontWeight="Bold" />
+
+            <TabControl Grid.Row="1" Margin="0,16,0,0">
+                <TabItem Header="General">
+                    <Grid Margin="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                            <TextBlock Text="Restaurant Name" FontWeight="SemiBold" />
+                            <TextBlock x:Name="AdminRestaurantNameText" Margin="0,6,0,0" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="Update Name" FontWeight="SemiBold" />
+                            <TextBox x:Name="RestaurantNameBox" Height="30" Margin="0,8,0,0" />
+                            <Button Content="Save Name" Margin="0,12,0,0" Height="32" Click="SaveRestaurantNameButton_OnClick" />
+                            <TextBlock x:Name="RestaurantNameStatusText" Margin="0,8,0,0" Foreground="DarkRed" TextWrapping="Wrap" />
+                        </StackPanel>
+                    </Grid>
+                </TabItem>
+                <TabItem Header="Categories">
+                    <Grid Margin="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                            <TextBlock Text="Existing Categories" FontWeight="SemiBold" />
+                            <ListBox x:Name="AdminCategoriesList" DisplayMemberPath="Name" Height="320" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="Add Category" FontWeight="SemiBold" />
+                            <TextBlock Text="Name" Margin="0,8,0,0" />
+                            <TextBox x:Name="CategoryNameBox" Height="30" />
+                            <TextBlock Text="Sort Order" Margin="0,8,0,0" />
+                            <TextBox x:Name="CategorySortOrderBox" Height="30">
+                                <TextBox.InputScope>
+                                    <InputScope>
+                                        <InputScope.Names>
+                                            <InputScopeName NameValue="Number" />
+                                        </InputScope.Names>
+                                    </InputScope>
+                                </TextBox.InputScope>
+                            </TextBox>
+                            <Button Content="Add Category" Margin="0,12,0,0" Height="32" Click="AddCategoryButton_OnClick" />
+                            <TextBlock x:Name="CategoryStatusText" Margin="0,8,0,0" Foreground="DarkRed" TextWrapping="Wrap" />
+                        </StackPanel>
+                    </Grid>
+                </TabItem>
+
+                <TabItem Header="Menu Items">
+                    <Grid Margin="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                            <TextBlock Text="Existing Items" FontWeight="SemiBold" />
+                            <ListBox x:Name="AdminMenuItemsList" DisplayMemberPath="Name" Height="320" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="Add Menu Item" FontWeight="SemiBold" />
+                            <TextBlock Text="Category" Margin="0,8,0,0" />
+                            <ComboBox x:Name="MenuItemCategoryCombo" Height="30" DisplayMemberPath="Name" />
+                            <TextBlock Text="Name" Margin="0,8,0,0" />
+                            <TextBox x:Name="MenuItemNameBox" Height="30" />
+                            <TextBlock Text="Price (cents)" Margin="0,8,0,0" />
+                            <TextBox x:Name="MenuItemPriceBox" Height="30">
+                                <TextBox.InputScope>
+                                    <InputScope>
+                                        <InputScope.Names>
+                                            <InputScopeName NameValue="Number" />
+                                        </InputScope.Names>
+                                    </InputScope>
+                                </TextBox.InputScope>
+                            </TextBox>
+                            <TextBlock Text="Tax Rate (bps)" Margin="0,8,0,0" />
+                            <TextBox x:Name="MenuItemTaxBox" Height="30">
+                                <TextBox.InputScope>
+                                    <InputScope>
+                                        <InputScope.Names>
+                                            <InputScopeName NameValue="Number" />
+                                        </InputScope.Names>
+                                    </InputScope>
+                                </TextBox.InputScope>
+                            </TextBox>
+                            <Button Content="Add Item" Margin="0,12,0,0" Height="32" Click="AddMenuItemButton_OnClick" />
+                            <TextBlock x:Name="MenuItemStatusText" Margin="0,8,0,0" Foreground="DarkRed" TextWrapping="Wrap" />
+                        </StackPanel>
+                    </Grid>
+                </TabItem>
+
+                <TabItem Header="Users">
+                    <Grid Margin="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                            <TextBlock Text="Existing Users" FontWeight="SemiBold" />
+                            <ListBox x:Name="AdminUsersList" DisplayMemberPath="DisplayName" Height="320" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="Add User" FontWeight="SemiBold" />
+                            <TextBlock Text="Display Name" Margin="0,8,0,0" />
+                            <TextBox x:Name="UserNameBox" Height="30" />
+                            <TextBlock Text="PIN" Margin="0,8,0,0" />
+                            <PasswordBox x:Name="UserPinBox" Height="30">
+                                <PasswordBox.InputScope>
+                                    <InputScope>
+                                        <InputScope.Names>
+                                            <InputScopeName NameValue="Number" />
+                                        </InputScope.Names>
+                                    </InputScope>
+                                </PasswordBox.InputScope>
+                            </PasswordBox>
+                            <TextBlock Text="Role" Margin="0,8,0,0" />
+                            <ComboBox x:Name="UserRoleCombo" Height="30" />
+                            <CheckBox x:Name="UserActiveCheck" Content="Active" IsChecked="True" Margin="0,10,0,0" />
+                            <Button Content="Add User" Margin="0,12,0,0" Height="32" Click="AddUserButton_OnClick" />
+                            <TextBlock x:Name="UserStatusText" Margin="0,8,0,0" Foreground="DarkRed" TextWrapping="Wrap" />
+                        </StackPanel>
+                    </Grid>
+                </TabItem>
+            </TabControl>
+
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+                <Button Content="Back" Width="110" Click="BackToOrderButton_OnClick" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

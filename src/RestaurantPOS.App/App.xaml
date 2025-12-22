@@ -1,0 +1,148 @@
+﻿<Application x:Class="RestaurantPOS.App.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:RestaurantPOS.App">
+    <Application.Resources>
+        <Style TargetType="Window">
+            <Setter Property="FontSize" Value="16" />
+        </Style>
+
+        <Style TargetType="Button">
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="MinHeight" Value="44" />
+            <Setter Property="MinWidth" Value="90" />
+            <Setter Property="Padding" Value="16,8" />
+        </Style>
+
+        <Style TargetType="TextBox">
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="MinHeight" Value="40" />
+            <Setter Property="Padding" Value="8,6" />
+        </Style>
+
+        <Style TargetType="PasswordBox">
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="MinHeight" Value="40" />
+            <Setter Property="Padding" Value="8,6" />
+        </Style>
+
+        <Style TargetType="ComboBox">
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="MinHeight" Value="40" />
+            <Setter Property="Padding" Value="8,4" />
+        </Style>
+
+        <Style TargetType="ListBox">
+            <Setter Property="IsManipulationEnabled" Value="True" />
+            <Setter Property="ScrollViewer.PanningMode" Value="VerticalOnly" />
+            <Setter Property="ScrollViewer.IsDeferredScrollingEnabled" Value="True" />
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+        </Style>
+
+        <Style TargetType="ListBoxItem">
+            <Setter Property="MinHeight" Value="44" />
+            <Setter Property="Padding" Value="10,6" />
+        </Style>
+
+        <Style TargetType="ListView">
+            <Setter Property="IsManipulationEnabled" Value="True" />
+            <Setter Property="ScrollViewer.PanningMode" Value="VerticalOnly" />
+            <Setter Property="ScrollViewer.IsDeferredScrollingEnabled" Value="True" />
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+        </Style>
+
+        <Style TargetType="ListViewItem">
+            <Setter Property="MinHeight" Value="44" />
+            <Setter Property="Padding" Value="10,6" />
+        </Style>
+
+        <Style TargetType="Menu">
+            <Setter Property="FontSize" Value="16" />
+        </Style>
+
+        <Style TargetType="MenuItem">
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="MinHeight" Value="44" />
+            <Setter Property="Padding" Value="16,8" />
+        </Style>
+
+        <Style x:Key="TouchCalendarDayButtonStyle" TargetType="CalendarDayButton">
+            <Setter Property="MinWidth" Value="40" />
+            <Setter Property="MinHeight" Value="40" />
+            <Setter Property="FontSize" Value="40" />
+            <Setter Property="Padding" Value="0" />
+            <Style.Triggers>
+                <Trigger Property="IsHitTestVisible" Value="False">
+                    <Setter Property="MinHeight" Value="48" />
+                    <Setter Property="FontSize" Value="36" />
+                    <Setter Property="Padding" Value="2,2" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="TouchCalendarButtonStyle" TargetType="CalendarButton">
+            <Setter Property="MinHeight" Value="38" />
+            <Setter Property="FontSize" Value="26" />
+            <Setter Property="Padding" Value="8,6" />
+        </Style>
+
+        <Style x:Key="TouchCalendarItemStyle" TargetType="CalendarItem">
+            <Setter Property="MinWidth" Value="600" />
+            <Setter Property="MinHeight" Value="480" />
+        </Style>
+
+        <Style x:Key="TouchCalendarStyle" TargetType="Calendar">
+            <Setter Property="Width" Value="400" />
+            <Setter Property="Height" Value="400" />
+            <Setter Property="FontSize" Value="21" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="CalendarDayButtonStyle" Value="{StaticResource TouchCalendarDayButtonStyle}" />
+            <Setter Property="CalendarButtonStyle" Value="{StaticResource TouchCalendarButtonStyle}" />
+            <Setter Property="CalendarItemStyle" Value="{StaticResource TouchCalendarItemStyle}" />
+        </Style>
+
+        <Style TargetType="DatePicker">
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="MinHeight" Value="56" />
+            <Setter Property="Padding" Value="10,6" />
+            <Setter Property="MinWidth" Value="130" />
+            <Setter Property="CalendarStyle" Value="{StaticResource TouchCalendarStyle}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="DatePicker">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <DatePickerTextBox x:Name="PART_TextBox" Grid.Column="0"
+                                               Focusable="{TemplateBinding Focusable}"
+                                               HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                               VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                               MinWidth="90" Padding="2,0,2,0" Margin="0" />
+                            <ToggleButton x:Name="PART_Button" Grid.Column="1" Focusable="False"
+                                          Width="60" Padding="10,6" Margin="0" ClickMode="Press"
+                                          IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}">
+                                <Viewbox Width="26" Height="26">
+                                    <Path Stroke="{TemplateBinding Foreground}" StrokeThickness="1.6"
+                                          Data="M4,3 H22 V22 H4 Z M4,8 H22 M8,1 V6 M18,1 V6" />
+                                </Viewbox>
+                            </ToggleButton>
+                            <Popup x:Name="PART_Popup" Placement="Bottom" AllowsTransparency="True"
+                                   Focusable="False" StaysOpen="False"
+                                   PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}"
+                                   HorizontalOffset="0" VerticalOffset="4"
+                                   IsOpen="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}}">
+                                <Border BorderBrush="{TemplateBinding BorderBrush}"
+                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                        Background="{TemplateBinding Background}">
+                                    <Calendar x:Name="PART_Calendar" Style="{TemplateBinding CalendarStyle}" />
+                                </Border>
+                            </Popup>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Application.Resources>
+</Application>
