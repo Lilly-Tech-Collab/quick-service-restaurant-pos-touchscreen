@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "H0AGWajQHGo=",
+  "dgSpecHash": "4CH3snRuYdY=",
   "success": true,
-  "projectFilePath": "C:\\LillyTech\\poc\\touchscreen\\src\\RestaurantPOS.Data\\RestaurantPOS.Data.csproj",
+  "projectFilePath": "C:\\Users\\ganap\\source\\repos\\quick-service-restaurant-pos-touchscreen\\src\\RestaurantPOS.Data\\RestaurantPOS.Data.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\ganap\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\ganap\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\7.0.0\\microsoft.bcl.asyncinterfaces.7.0.0.nupkg.sha512",

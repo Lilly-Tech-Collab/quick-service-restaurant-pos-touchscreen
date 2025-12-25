@@ -34,41 +34,40 @@ public class OrderService
 
     public async Task<Order> AddItemAsync(Guid orderId, MenuItem menuItem)
     {
+        var result = await AddItemWithResultAsync(orderId, menuItem);
+        return result.Order;
+    }
+
+    public async Task<(Order Order, OrderItem Item)> AddItemWithResultAsync(Guid orderId, MenuItem menuItem)
+    {
         var order = await _db.Orders
             .Include(o => o.Items)
+            .ThenInclude(i => i.Customizations)
             .FirstAsync(o => o.Id == orderId);
 
-        var existing = order.Items.FirstOrDefault(i => i.MenuItemId == menuItem.Id);
-        if (existing is null)
+        var item = new OrderItem
         {
-            var item = new OrderItem
-            {
-                OrderId = order.Id,
-                MenuItemId = menuItem.Id,
-                NameSnapshot = menuItem.Name,
-                UnitPriceCents = menuItem.PriceCents,
-                Qty = 1,
-                LineTotalCents = menuItem.PriceCents
-            };
-            order.Items.Add(item);
-            _db.OrderItems.Add(item);
-        }
-        else
-        {
-            existing.Qty += 1;
-            existing.LineTotalCents = existing.UnitPriceCents * existing.Qty;
-        }
+            OrderId = order.Id,
+            MenuItemId = menuItem.Id,
+            NameSnapshot = menuItem.Name,
+            UnitPriceCents = menuItem.PriceCents,
+            Qty = 1,
+            LineTotalCents = menuItem.PriceCents
+        };
+        order.Items.Add(item);
+        _db.OrderItems.Add(item);
 
         await RecalculateTotalsAsync(order);
         await SaveChangesWithRetryAsync();
-        await _db.Entry(order).Collection(o => o.Items).LoadAsync();
-        return order;
+        await _db.Entry(order).Collection(o => o.Items).Query().Include(i => i.Customizations).LoadAsync();
+        return (order, item);
     }
 
     public async Task<Order> RemoveItemAsync(Guid orderId, Guid orderItemId)
     {
         var order = await _db.Orders
             .Include(o => o.Items)
+            .ThenInclude(i => i.Customizations)
             .FirstAsync(o => o.Id == orderId);
 
         var item = order.Items.FirstOrDefault(i => i.Id == orderItemId);
@@ -82,7 +81,67 @@ public class OrderService
 
         await RecalculateTotalsAsync(order);
         await SaveChangesWithRetryAsync();
-        await _db.Entry(order).Collection(o => o.Items).LoadAsync();
+        await _db.Entry(order).Collection(o => o.Items).Query().Include(i => i.Customizations).LoadAsync();
+        return order;
+    }
+
+    public async Task<Order> AddCustomizationAsync(Guid orderId, Guid orderItemId, CustomizationItem customization)
+    {
+        var order = await _db.Orders
+            .Include(o => o.Items)
+            .ThenInclude(i => i.Customizations)
+            .FirstAsync(o => o.Id == orderId);
+
+        var item = order.Items.FirstOrDefault(i => i.Id == orderItemId);
+        if (item is null)
+        {
+            return order;
+        }
+
+        var orderCustomization = new OrderItemCustomization
+        {
+            OrderItemId = item.Id,
+            CustomizationItemId = customization.Id,
+            NameSnapshot = customization.Name,
+            PriceCents = customization.PriceCents
+        };
+
+        item.Customizations.Add(orderCustomization);
+        _db.OrderItemCustomizations.Add(orderCustomization);
+        UpdateOrderItemNotes(item);
+
+        await RecalculateTotalsAsync(order);
+        await SaveChangesWithRetryAsync();
+        await _db.Entry(order).Collection(o => o.Items).Query().Include(i => i.Customizations).LoadAsync();
+        return order;
+    }
+
+    public async Task<Order> RemoveCustomizationAsync(Guid orderId, Guid orderItemId, Guid customizationId)
+    {
+        var order = await _db.Orders
+            .Include(o => o.Items)
+            .ThenInclude(i => i.Customizations)
+            .FirstAsync(o => o.Id == orderId);
+
+        var item = order.Items.FirstOrDefault(i => i.Id == orderItemId);
+        if (item is null)
+        {
+            return order;
+        }
+
+        var customization = item.Customizations.FirstOrDefault(c => c.Id == customizationId);
+        if (customization is null)
+        {
+            return order;
+        }
+
+        item.Customizations.Remove(customization);
+        _db.OrderItemCustomizations.Remove(customization);
+        UpdateOrderItemNotes(item);
+
+        await RecalculateTotalsAsync(order);
+        await SaveChangesWithRetryAsync();
+        await _db.Entry(order).Collection(o => o.Items).Query().Include(i => i.Customizations).LoadAsync();
         return order;
     }
 
@@ -91,6 +150,7 @@ public class OrderService
         return await _db.Orders
             .AsNoTracking()
             .Include(o => o.Items)
+            .ThenInclude(i => i.Customizations)
             .FirstOrDefaultAsync(o => o.Id == orderId);
     }
 
@@ -105,6 +165,9 @@ public class OrderService
         var tax = 0;
         foreach (var item in order.Items)
         {
+            var customizationTotal = item.Customizations.Sum(c => c.PriceCents);
+            item.LineTotalCents = (item.UnitPriceCents + customizationTotal) * item.Qty;
+            UpdateOrderItemNotes(item);
             subtotal += item.LineTotalCents;
             if (menuItems.TryGetValue(item.MenuItemId, out var menu))
             {
@@ -115,6 +178,17 @@ public class OrderService
         order.SubtotalCents = subtotal;
         order.TaxCents = tax;
         order.TotalCents = subtotal + tax - order.DiscountCents;
+    }
+
+    private static void UpdateOrderItemNotes(OrderItem item)
+    {
+        if (item.Customizations.Count == 0)
+        {
+            item.Notes = null;
+            return;
+        }
+
+        item.Notes = string.Join(", ", item.Customizations.Select(c => c.NameSnapshot));
     }
 
     private async Task SaveChangesWithRetryAsync()

@@ -20,3 +20,15 @@ C:\LillyTech\poc\touchscreen\src\RestaurantPOS.Domain\obj\Debug\net9.0\Restauran
 C:\LillyTech\poc\touchscreen\src\RestaurantPOS.Domain\obj\Debug\net9.0\refint\RestaurantPOS.Domain.dll
 C:\LillyTech\poc\touchscreen\src\RestaurantPOS.Domain\obj\Debug\net9.0\RestaurantPOS.Domain.pdb
 C:\LillyTech\poc\touchscreen\src\RestaurantPOS.Domain\obj\Debug\net9.0\ref\RestaurantPOS.Domain.dll
+C:\Users\ganap\source\repos\quick-service-restaurant-pos-touchscreen\src\RestaurantPOS.Domain\bin\Debug\net9.0\RestaurantPOS.Domain.deps.json
+C:\Users\ganap\source\repos\quick-service-restaurant-pos-touchscreen\src\RestaurantPOS.Domain\bin\Debug\net9.0\RestaurantPOS.Domain.dll
+C:\Users\ganap\source\repos\quick-service-restaurant-pos-touchscreen\src\RestaurantPOS.Domain\bin\Debug\net9.0\RestaurantPOS.Domain.pdb
+C:\Users\ganap\source\repos\quick-service-restaurant-pos-touchscreen\src\RestaurantPOS.Domain\obj\Debug\net9.0\RestaurantPOS.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\ganap\source\repos\quick-service-restaurant-pos-touchscreen\src\RestaurantPOS.Domain\obj\Debug\net9.0\RestaurantPOS.Domain.AssemblyInfoInputs.cache
+C:\Users\ganap\source\repos\quick-service-restaurant-pos-touchscreen\src\RestaurantPOS.Domain\obj\Debug\net9.0\RestaurantPOS.Domain.AssemblyInfo.cs
+C:\Users\ganap\source\repos\quick-service-restaurant-pos-touchscreen\src\RestaurantPOS.Domain\obj\Debug\net9.0\RestaurantPOS.Domain.csproj.CoreCompileInputs.cache
+C:\Users\ganap\source\repos\quick-service-restaurant-pos-touchscreen\src\RestaurantPOS.Domain\obj\Debug\net9.0\RestaurantPOS.Domain.sourcelink.json
+C:\Users\ganap\source\repos\quick-service-restaurant-pos-touchscreen\src\RestaurantPOS.Domain\obj\Debug\net9.0\RestaurantPOS.Domain.dll
+C:\Users\ganap\source\repos\quick-service-restaurant-pos-touchscreen\src\RestaurantPOS.Domain\obj\Debug\net9.0\refint\RestaurantPOS.Domain.dll
+C:\Users\ganap\source\repos\quick-service-restaurant-pos-touchscreen\src\RestaurantPOS.Domain\obj\Debug\net9.0\RestaurantPOS.Domain.pdb
+C:\Users\ganap\source\repos\quick-service-restaurant-pos-touchscreen\src\RestaurantPOS.Domain\obj\Debug\net9.0\ref\RestaurantPOS.Domain.dll

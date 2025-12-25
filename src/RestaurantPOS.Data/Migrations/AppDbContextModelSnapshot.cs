@@ -216,6 +216,51 @@ namespace RestaurantPOS.Data.Migrations
                         });
                 });
 
+            modelBuilder.Entity("RestaurantPOS.Domain.Entities.CustomizationItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("PriceCents")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CustomizationItems", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("f4a7e147-93a6-47de-9cc9-1706e3f54f90"),
+                            IsActive = true,
+                            Name = "No Cheese",
+                            PriceCents = 0
+                        },
+                        new
+                        {
+                            Id = new Guid("6f1f0fd3-1224-4bcf-9f7e-93694dc43071"),
+                            IsActive = true,
+                            Name = "Extra Cheese",
+                            PriceCents = 50
+                        },
+                        new
+                        {
+                            Id = new Guid("7b1d6c2a-7d8f-4d6e-8071-71e483f3c4c6"),
+                            IsActive = true,
+                            Name = "Extra Sauce",
+                            PriceCents = 25
+                        });
+                });
+
             modelBuilder.Entity("RestaurantPOS.Domain.Entities.Order", b =>
                 {
                     b.Property<Guid>("Id")
@@ -297,6 +342,35 @@ namespace RestaurantPOS.Data.Migrations
                     b.ToTable("OrderItems", (string)null);
                 });
 
+            modelBuilder.Entity("RestaurantPOS.Domain.Entities.OrderItemCustomization", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("CustomizationItemId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("NameSnapshot")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("OrderItemId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("PriceCents")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomizationItemId");
+
+                    b.HasIndex("OrderItemId");
+
+                    b.ToTable("OrderItemCustomizations", (string)null);
+                });
+
             modelBuilder.Entity("RestaurantPOS.Domain.Entities.Payment", b =>
                 {
                     b.Property<Guid>("Id")
@@ -374,6 +448,21 @@ namespace RestaurantPOS.Data.Migrations
                         .WithMany()
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("RestaurantPOS.Domain.Entities.OrderItemCustomization", b =>
+                {
+                    b.HasOne("RestaurantPOS.Domain.Entities.CustomizationItem", null)
+                        .WithMany()
+                        .HasForeignKey("CustomizationItemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("RestaurantPOS.Domain.Entities.OrderItem", null)
+                        .WithMany("Customizations")
+                        .HasForeignKey("OrderItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 

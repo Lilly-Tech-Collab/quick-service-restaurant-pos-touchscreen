@@ -14,11 +14,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\LillyTech\\poc\\touchscreen\\src\\RestaurantPOS.Domain\\RestaurantPOS.Domain.csproj",
+      "projectUniqueName": "C:\\Users\\ganap\\source\\repos\\quick-service-restaurant-pos-touchscreen\\src\\RestaurantPOS.Domain\\RestaurantPOS.Domain.csproj",
       "projectName": "RestaurantPOS.Domain",
-      "projectPath": "C:\\LillyTech\\poc\\touchscreen\\src\\RestaurantPOS.Domain\\RestaurantPOS.Domain.csproj",
+      "projectPath": "C:\\Users\\ganap\\source\\repos\\quick-service-restaurant-pos-touchscreen\\src\\RestaurantPOS.Domain\\RestaurantPOS.Domain.csproj",
       "packagesPath": "C:\\Users\\ganap\\.nuget\\packages\\",
-      "outputPath": "C:\\LillyTech\\poc\\touchscreen\\src\\RestaurantPOS.Domain\\obj\\",
+      "outputPath": "C:\\Users\\ganap\\source\\repos\\quick-service-restaurant-pos-touchscreen\\src\\RestaurantPOS.Domain\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

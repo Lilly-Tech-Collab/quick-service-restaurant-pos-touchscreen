@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\LillyTech\\poc\\touchscreen\\src\\RestaurantPOS.App\\RestaurantPOS.App.csproj": {}
+    "C:\\Users\\ganap\\source\\repos\\quick-service-restaurant-pos-touchscreen\\src\\RestaurantPOS.App\\RestaurantPOS.App.csproj": {}
   },
   "projects": {
-    "C:\\LillyTech\\poc\\touchscreen\\src\\RestaurantPOS.Application\\RestaurantPOS.Application.csproj": {
+    "C:\\Users\\ganap\\source\\repos\\quick-service-restaurant-pos-touchscreen\\src\\RestaurantPOS.Application\\RestaurantPOS.Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\LillyTech\\poc\\touchscreen\\src\\RestaurantPOS.Application\\RestaurantPOS.Application.csproj",
+        "projectUniqueName": "C:\\Users\\ganap\\source\\repos\\quick-service-restaurant-pos-touchscreen\\src\\RestaurantPOS.Application\\RestaurantPOS.Application.csproj",
         "projectName": "RestaurantPOS.Application",
-        "projectPath": "C:\\LillyTech\\poc\\touchscreen\\src\\RestaurantPOS.Application\\RestaurantPOS.Application.csproj",
+        "projectPath": "C:\\Users\\ganap\\source\\repos\\quick-service-restaurant-pos-touchscreen\\src\\RestaurantPOS.Application\\RestaurantPOS.Application.csproj",
         "packagesPath": "C:\\Users\\ganap\\.nuget\\packages\\",
-        "outputPath": "C:\\LillyTech\\poc\\touchscreen\\src\\RestaurantPOS.Application\\obj\\",
+        "outputPath": "C:\\Users\\ganap\\source\\repos\\quick-service-restaurant-pos-touchscreen\\src\\RestaurantPOS.Application\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -33,11 +33,11 @@
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
-              "C:\\LillyTech\\poc\\touchscreen\\src\\RestaurantPOS.Data\\RestaurantPOS.Data.csproj": {
-                "projectPath": "C:\\LillyTech\\poc\\touchscreen\\src\\RestaurantPOS.Data\\RestaurantPOS.Data.csproj"
+              "C:\\Users\\ganap\\source\\repos\\quick-service-restaurant-pos-touchscreen\\src\\RestaurantPOS.Data\\RestaurantPOS.Data.csproj": {
+                "projectPath": "C:\\Users\\ganap\\source\\repos\\quick-service-restaurant-pos-touchscreen\\src\\RestaurantPOS.Data\\RestaurantPOS.Data.csproj"
               },
-              "C:\\LillyTech\\poc\\touchscreen\\src\\RestaurantPOS.Domain\\RestaurantPOS.Domain.csproj": {
-                "projectPath": "C:\\LillyTech\\poc\\touchscreen\\src\\RestaurantPOS.Domain\\RestaurantPOS.Domain.csproj"
+              "C:\\Users\\ganap\\source\\repos\\quick-service-restaurant-pos-touchscreen\\src\\RestaurantPOS.Domain\\RestaurantPOS.Domain.csproj": {
+                "projectPath": "C:\\Users\\ganap\\source\\repos\\quick-service-restaurant-pos-touchscreen\\src\\RestaurantPOS.Domain\\RestaurantPOS.Domain.csproj"
               }
             }
           }
@@ -77,14 +77,14 @@
         }
       }
     },
-    "C:\\LillyTech\\poc\\touchscreen\\src\\RestaurantPOS.App\\RestaurantPOS.App.csproj": {
+    "C:\\Users\\ganap\\source\\repos\\quick-service-restaurant-pos-touchscreen\\src\\RestaurantPOS.App\\RestaurantPOS.App.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\LillyTech\\poc\\touchscreen\\src\\RestaurantPOS.App\\RestaurantPOS.App.csproj",
+        "projectUniqueName": "C:\\Users\\ganap\\source\\repos\\quick-service-restaurant-pos-touchscreen\\src\\RestaurantPOS.App\\RestaurantPOS.App.csproj",
         "projectName": "RestaurantPOS.App",
-        "projectPath": "C:\\LillyTech\\poc\\touchscreen\\src\\RestaurantPOS.App\\RestaurantPOS.App.csproj",
+        "projectPath": "C:\\Users\\ganap\\source\\repos\\quick-service-restaurant-pos-touchscreen\\src\\RestaurantPOS.App\\RestaurantPOS.App.csproj",
         "packagesPath": "C:\\Users\\ganap\\.nuget\\packages\\",
-        "outputPath": "C:\\LillyTech\\poc\\touchscreen\\src\\RestaurantPOS.App\\obj\\",
+        "outputPath": "C:\\Users\\ganap\\source\\repos\\quick-service-restaurant-pos-touchscreen\\src\\RestaurantPOS.App\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -106,8 +106,8 @@
           "net9.0-windows7.0": {
             "targetAlias": "net9.0-windows",
             "projectReferences": {
-              "C:\\LillyTech\\poc\\touchscreen\\src\\RestaurantPOS.Application\\RestaurantPOS.Application.csproj": {
-                "projectPath": "C:\\LillyTech\\poc\\touchscreen\\src\\RestaurantPOS.Application\\RestaurantPOS.Application.csproj"
+              "C:\\Users\\ganap\\source\\repos\\quick-service-restaurant-pos-touchscreen\\src\\RestaurantPOS.Application\\RestaurantPOS.Application.csproj": {
+                "projectPath": "C:\\Users\\ganap\\source\\repos\\quick-service-restaurant-pos-touchscreen\\src\\RestaurantPOS.Application\\RestaurantPOS.Application.csproj"
               }
             }
           }
@@ -172,14 +172,14 @@
         }
       }
     },
-    "C:\\LillyTech\\poc\\touchscreen\\src\\RestaurantPOS.Data\\RestaurantPOS.Data.csproj": {
+    "C:\\Users\\ganap\\source\\repos\\quick-service-restaurant-pos-touchscreen\\src\\RestaurantPOS.Data\\RestaurantPOS.Data.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\LillyTech\\poc\\touchscreen\\src\\RestaurantPOS.Data\\RestaurantPOS.Data.csproj",
+        "projectUniqueName": "C:\\Users\\ganap\\source\\repos\\quick-service-restaurant-pos-touchscreen\\src\\RestaurantPOS.Data\\RestaurantPOS.Data.csproj",
         "projectName": "RestaurantPOS.Data",
-        "projectPath": "C:\\LillyTech\\poc\\touchscreen\\src\\RestaurantPOS.Data\\RestaurantPOS.Data.csproj",
+        "projectPath": "C:\\Users\\ganap\\source\\repos\\quick-service-restaurant-pos-touchscreen\\src\\RestaurantPOS.Data\\RestaurantPOS.Data.csproj",
         "packagesPath": "C:\\Users\\ganap\\.nuget\\packages\\",
-        "outputPath": "C:\\LillyTech\\poc\\touchscreen\\src\\RestaurantPOS.Data\\obj\\",
+        "outputPath": "C:\\Users\\ganap\\source\\repos\\quick-service-restaurant-pos-touchscreen\\src\\RestaurantPOS.Data\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -201,8 +201,8 @@
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
-              "C:\\LillyTech\\poc\\touchscreen\\src\\RestaurantPOS.Domain\\RestaurantPOS.Domain.csproj": {
-                "projectPath": "C:\\LillyTech\\poc\\touchscreen\\src\\RestaurantPOS.Domain\\RestaurantPOS.Domain.csproj"
+              "C:\\Users\\ganap\\source\\repos\\quick-service-restaurant-pos-touchscreen\\src\\RestaurantPOS.Domain\\RestaurantPOS.Domain.csproj": {
+                "projectPath": "C:\\Users\\ganap\\source\\repos\\quick-service-restaurant-pos-touchscreen\\src\\RestaurantPOS.Domain\\RestaurantPOS.Domain.csproj"
               }
             }
           }
@@ -258,14 +258,14 @@
         }
       }
     },
-    "C:\\LillyTech\\poc\\touchscreen\\src\\RestaurantPOS.Domain\\RestaurantPOS.Domain.csproj": {
+    "C:\\Users\\ganap\\source\\repos\\quick-service-restaurant-pos-touchscreen\\src\\RestaurantPOS.Domain\\RestaurantPOS.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\LillyTech\\poc\\touchscreen\\src\\RestaurantPOS.Domain\\RestaurantPOS.Domain.csproj",
+        "projectUniqueName": "C:\\Users\\ganap\\source\\repos\\quick-service-restaurant-pos-touchscreen\\src\\RestaurantPOS.Domain\\RestaurantPOS.Domain.csproj",
         "projectName": "RestaurantPOS.Domain",
-        "projectPath": "C:\\LillyTech\\poc\\touchscreen\\src\\RestaurantPOS.Domain\\RestaurantPOS.Domain.csproj",
+        "projectPath": "C:\\Users\\ganap\\source\\repos\\quick-service-restaurant-pos-touchscreen\\src\\RestaurantPOS.Domain\\RestaurantPOS.Domain.csproj",
         "packagesPath": "C:\\Users\\ganap\\.nuget\\packages\\",
-        "outputPath": "C:\\LillyTech\\poc\\touchscreen\\src\\RestaurantPOS.Domain\\obj\\",
+        "outputPath": "C:\\Users\\ganap\\source\\repos\\quick-service-restaurant-pos-touchscreen\\src\\RestaurantPOS.Domain\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

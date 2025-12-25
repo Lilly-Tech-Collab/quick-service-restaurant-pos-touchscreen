@@ -16,6 +16,7 @@ public partial class MainWindow : Window
 {
     private readonly AuthService _authService;
     private readonly MenuService _menuService;
+    private readonly CustomizationService _customizationService;
     private readonly OrderService _orderService;
     private readonly PaymentService _paymentService;
     private readonly ReportService _reportService;
@@ -29,13 +30,19 @@ public partial class MainWindow : Window
     private MenuItemEntity? _selectedMenuItem;
     private OrderItem? _selectedOrderItem;
     private MenuCategory? _selectedCategory;
+    private CustomizationItem? _selectedCustomizationItem;
+    private OrderItemCustomization? _selectedOrderCustomization;
+    private bool _isUpdatingTicketSelection;
 
     public ObservableCollection<MenuCategory> Categories { get; } = new();
     public ObservableCollection<MenuItemEntity> MenuItems { get; } = new();
     public ObservableCollection<OrderItem> TicketItems { get; } = new();
     public ObservableCollection<OrderItem> ReceiptItems { get; } = new();
+    public ObservableCollection<CustomizationItem> Customizations { get; } = new();
+    public ObservableCollection<OrderItemCustomization> SelectedOrderCustomizations { get; } = new();
     public ObservableCollection<MenuCategory> AdminCategories { get; } = new();
     public ObservableCollection<MenuItemEntity> AdminMenuItems { get; } = new();
+    public ObservableCollection<CustomizationItem> AdminCustomizations { get; } = new();
     public ObservableCollection<User> AdminUsers { get; } = new();
     public ObservableCollection<ReportOrderRow> ReportOrders { get; } = new();
     public ObservableCollection<ReportItemRow> ReportItemSales { get; } = new();
@@ -46,6 +53,7 @@ public partial class MainWindow : Window
     public MainWindow(
         AuthService authService,
         MenuService menuService,
+        CustomizationService customizationService,
         OrderService orderService,
         PaymentService paymentService,
         ReportService reportService,
@@ -55,6 +63,7 @@ public partial class MainWindow : Window
         InitializeComponent();
         _authService = authService;
         _menuService = menuService;
+        _customizationService = customizationService;
         _orderService = orderService;
         _paymentService = paymentService;
         _reportService = reportService;
@@ -65,8 +74,11 @@ public partial class MainWindow : Window
         MenuItemsList.ItemsSource = MenuItems;
         TicketItemsList.ItemsSource = TicketItems;
         ReceiptItemsList.ItemsSource = ReceiptItems;
+        CustomizationsList.ItemsSource = Customizations;
+        SelectedCustomizationsList.ItemsSource = SelectedOrderCustomizations;
         AdminCategoriesList.ItemsSource = AdminCategories;
         AdminMenuItemsList.ItemsSource = AdminMenuItems;
+        AdminCustomizationsList.ItemsSource = AdminCustomizations;
         AdminUsersList.ItemsSource = AdminUsers;
         ReportOrdersList.ItemsSource = ReportOrders;
         ReportItemSalesList.ItemsSource = ReportItemSales;
@@ -89,6 +101,7 @@ public partial class MainWindow : Window
     {
         await LoadRestaurantNameAsync();
         await LoadMenuAsync();
+        await LoadCustomizationsAsync();
         ShowLogin();
     }
 
@@ -131,6 +144,16 @@ public partial class MainWindow : Window
         foreach (var item in items)
         {
             MenuItems.Add(item);
+        }
+    }
+
+    private async Task LoadCustomizationsAsync()
+    {
+        Customizations.Clear();
+        var items = await _customizationService.GetCustomizationsAsync();
+        foreach (var item in items)
+        {
+            Customizations.Add(item);
         }
     }
 
@@ -228,6 +251,8 @@ public partial class MainWindow : Window
         _lastPaidOrder = null;
         ReceiptItems.Clear();
         TicketItems.Clear();
+        SelectedOrderCustomizations.Clear();
+        CustomizationStatusText.Text = string.Empty;
         UpdateTotalsDisplay(null);
         UpdatePayButtonState(null);
         UpdateRoleButtons(null);
@@ -264,22 +289,26 @@ public partial class MainWindow : Window
         }
 
         _selectedMenuItem = selectedItem;
-        _currentOrder = await _orderService.AddItemAsync(_currentOrder.Id, selectedItem);
+        var result = await _orderService.AddItemWithResultAsync(_currentOrder.Id, selectedItem);
+        _currentOrder = result.Order;
+        _selectedOrderItem = result.Item;
         await RefreshTicketAsync();
     }
 
     private void TicketItemsList_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        _selectedOrderItem = TicketItemsList.SelectedItem as OrderItem;
-    }
-
-    private async void TicketItemsList_OnItemTapped(object sender, MouseButtonEventArgs e)
-    {
-        if (_currentOrder is null)
+        if (_isUpdatingTicketSelection)
         {
             return;
         }
 
+        _selectedOrderItem = TicketItemsList.SelectedItem as OrderItem;
+        UpdateSelectedOrderCustomizations(_selectedOrderItem);
+        CustomizationStatusText.Text = string.Empty;
+    }
+
+    private async void TicketItemsList_OnItemTapped(object sender, MouseButtonEventArgs e)
+    {
         var selectedItem = GetItemFromEvent<OrderItem>(TicketItemsList, e.OriginalSource);
         if (selectedItem is null)
         {
@@ -287,8 +316,8 @@ public partial class MainWindow : Window
         }
 
         _selectedOrderItem = selectedItem;
-        _currentOrder = await _orderService.RemoveItemAsync(_currentOrder.Id, selectedItem.Id);
-        await RefreshTicketAsync();
+        TicketItemsList.SelectedItem = selectedItem;
+        UpdateSelectedOrderCustomizations(_selectedOrderItem);
     }
 
     private static TItem? GetItemFromEvent<TItem>(ItemsControl list, object originalSource)
@@ -343,7 +372,9 @@ public partial class MainWindow : Window
         }
 
         _selectedMenuItem = selectedItem;
-        _currentOrder = await _orderService.AddItemAsync(_currentOrder.Id, selectedItem);
+        var result = await _orderService.AddItemWithResultAsync(_currentOrder.Id, selectedItem);
+        _currentOrder = result.Order;
+        _selectedOrderItem = result.Item;
         await RefreshTicketAsync();
     }
 
@@ -357,6 +388,126 @@ public partial class MainWindow : Window
 
         _selectedOrderItem = selectedItem;
         _currentOrder = await _orderService.RemoveItemAsync(_currentOrder.Id, selectedItem.Id);
+        await RefreshTicketAsync();
+    }
+
+    private void CustomizationsList_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        _selectedCustomizationItem = CustomizationsList.SelectedItem as CustomizationItem;
+        CustomizationStatusText.Text = string.Empty;
+    }
+
+    private void SelectedCustomizationsList_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        _selectedOrderCustomization = SelectedCustomizationsList.SelectedItem as OrderItemCustomization;
+        CustomizationStatusText.Text = string.Empty;
+    }
+
+    private async void AddCustomizationButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (_currentOrder is null)
+        {
+            return;
+        }
+
+        if (_selectedOrderItem is null)
+        {
+            CustomizationStatusText.Text = "Select a ticket item first.";
+            return;
+        }
+
+        if (_selectedCustomizationItem is null)
+        {
+            CustomizationStatusText.Text = "Select a customization to add.";
+            return;
+        }
+
+        _currentOrder = await _orderService.AddCustomizationAsync(
+            _currentOrder.Id,
+            _selectedOrderItem.Id,
+            _selectedCustomizationItem);
+        await RefreshTicketAsync();
+    }
+
+    private async void CustomizationsList_OnItemTapped(object sender, MouseButtonEventArgs e)
+    {
+        if (_currentOrder is null)
+        {
+            return;
+        }
+
+        if (_selectedOrderItem is null)
+        {
+            CustomizationStatusText.Text = "Select a ticket item first.";
+            return;
+        }
+
+        var selectedCustomization = GetItemFromEvent<CustomizationItem>(CustomizationsList, e.OriginalSource);
+        if (selectedCustomization is null)
+        {
+            return;
+        }
+
+        _selectedCustomizationItem = selectedCustomization;
+        CustomizationsList.SelectedItem = selectedCustomization;
+        _currentOrder = await _orderService.AddCustomizationAsync(
+            _currentOrder.Id,
+            _selectedOrderItem.Id,
+            selectedCustomization);
+        await RefreshTicketAsync();
+    }
+
+    private async void RemoveCustomizationButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (_currentOrder is null)
+        {
+            return;
+        }
+
+        if (_selectedOrderItem is null)
+        {
+            CustomizationStatusText.Text = "Select a ticket item first.";
+            return;
+        }
+
+        if (_selectedOrderCustomization is null)
+        {
+            CustomizationStatusText.Text = "Select a customization to remove.";
+            return;
+        }
+
+        _currentOrder = await _orderService.RemoveCustomizationAsync(
+            _currentOrder.Id,
+            _selectedOrderItem.Id,
+            _selectedOrderCustomization.Id);
+        await RefreshTicketAsync();
+    }
+
+    private async void SelectedCustomizationsList_OnItemTapped(object sender, MouseButtonEventArgs e)
+    {
+        if (_currentOrder is null)
+        {
+            return;
+        }
+
+        if (_selectedOrderItem is null)
+        {
+            CustomizationStatusText.Text = "Select a ticket item first.";
+            return;
+        }
+
+        var selectedCustomization = GetItemFromEvent<OrderItemCustomization>(SelectedCustomizationsList, e.OriginalSource);
+        if (selectedCustomization is null)
+        {
+            return;
+        }
+
+        _selectedOrderCustomization = selectedCustomization;
+        SelectedCustomizationsList.SelectedItem = selectedCustomization;
+        _currentOrder = await _orderService.RemoveCustomizationAsync(
+            _currentOrder.Id,
+            _selectedOrderItem.Id,
+            selectedCustomization.Id);
         await RefreshTicketAsync();
     }
 
@@ -524,6 +675,29 @@ public partial class MainWindow : Window
         await LoadMenuAsync();
     }
 
+    private async void AddCustomizationItemButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        var name = CustomizationNameBox.Text.Trim();
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            CustomizationAdminStatusText.Text = "Enter a customization name.";
+            return;
+        }
+
+        if (!int.TryParse(CustomizationPriceBox.Text.Trim(), out var priceCents))
+        {
+            CustomizationAdminStatusText.Text = "Price must be an integer number of cents.";
+            return;
+        }
+
+        await _customizationService.AddCustomizationAsync(name, priceCents);
+        CustomizationNameBox.Text = string.Empty;
+        CustomizationPriceBox.Text = string.Empty;
+        CustomizationAdminStatusText.Text = "Customization added.";
+        await RefreshAdminDataAsync();
+        await LoadCustomizationsAsync();
+    }
+
     private async void AddUserButton_OnClick(object sender, RoutedEventArgs e)
     {
         var displayName = UserNameBox.Text.Trim();
@@ -560,6 +734,7 @@ public partial class MainWindow : Window
         {
             TicketItems.Clear();
             UpdateTotalsDisplay(null);
+            UpdateSelectedOrderCustomizations(null);
             return;
         }
 
@@ -568,6 +743,7 @@ public partial class MainWindow : Window
         {
             TicketItems.Clear();
             UpdateTotalsDisplay(null);
+            UpdateSelectedOrderCustomizations(null);
             return;
         }
 
@@ -593,19 +769,39 @@ public partial class MainWindow : Window
 
     private void UpdateTicketFromOrder(Order? order)
     {
+        _isUpdatingTicketSelection = true;
         TicketItems.Clear();
         if (order is null)
         {
             UpdateTotalsDisplay(null);
             UpdatePayButtonState(null);
+            UpdateSelectedOrderCustomizations(null);
+            _isUpdatingTicketSelection = false;
             return;
         }
 
-        foreach (var item in order.Items.OrderBy(i => i.NameSnapshot))
+        var selectedItemId = _selectedOrderItem?.Id;
+        foreach (var item in order.Items)
         {
             TicketItems.Add(item);
         }
 
+        if (selectedItemId.HasValue)
+        {
+            var selectedItem = TicketItems.FirstOrDefault(i => i.Id == selectedItemId.Value);
+            if (selectedItem is not null)
+            {
+                TicketItemsList.SelectedItem = selectedItem;
+                _selectedOrderItem = selectedItem;
+            }
+            else
+            {
+                _selectedOrderItem = null;
+            }
+        }
+        _isUpdatingTicketSelection = false;
+
+        UpdateSelectedOrderCustomizations(_selectedOrderItem);
         UpdateTotalsDisplay(order);
         UpdatePayButtonState(order);
     }
@@ -623,7 +819,7 @@ public partial class MainWindow : Window
     private void UpdateReceiptDisplay(Order order, PaymentMethod method)
     {
         ReceiptItems.Clear();
-        foreach (var item in order.Items.OrderBy(i => i.NameSnapshot))
+        foreach (var item in order.Items)
         {
             ReceiptItems.Add(item);
         }
@@ -685,6 +881,7 @@ public partial class MainWindow : Window
     {
         CategoryStatusText.Text = string.Empty;
         MenuItemStatusText.Text = string.Empty;
+        CustomizationAdminStatusText.Text = string.Empty;
         UserStatusText.Text = string.Empty;
         RestaurantNameStatusText.Text = string.Empty;
 
@@ -702,6 +899,13 @@ public partial class MainWindow : Window
             AdminMenuItems.Add(item);
         }
 
+        AdminCustomizations.Clear();
+        var customizations = await _customizationService.GetAllCustomizationsAsync();
+        foreach (var customization in customizations)
+        {
+            AdminCustomizations.Add(customization);
+        }
+
         AdminUsers.Clear();
         var users = await _userService.GetUsersAsync();
         foreach (var user in users)
@@ -713,6 +917,21 @@ public partial class MainWindow : Window
         if (MenuItemCategoryCombo.SelectedItem is null && AdminCategories.Count > 0)
         {
             MenuItemCategoryCombo.SelectedItem = AdminCategories[0];
+        }
+    }
+
+    private void UpdateSelectedOrderCustomizations(OrderItem? orderItem)
+    {
+        SelectedOrderCustomizations.Clear();
+        _selectedOrderCustomization = null;
+        if (orderItem is null)
+        {
+            return;
+        }
+
+        foreach (var customization in orderItem.Customizations.OrderBy(c => c.NameSnapshot))
+        {
+            SelectedOrderCustomizations.Add(customization);
         }
     }
 

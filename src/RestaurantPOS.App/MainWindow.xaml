@@ -7,6 +7,9 @@
         mc:Ignorable="d"
         Title="Restaurant POS" Height="720" Width="1100" Icon="Assets/transparent.png"
         Loaded="MainWindow_OnLoaded">
+    <Window.Resources>
+        <local:CustomizationDisplayConverter x:Key="CustomizationDisplayConverter" />
+    </Window.Resources>
     <Grid Margin="12,0,12,12">
         <Grid x:Name="LoginPanel">
             <Grid.RowDefinitions>
@@ -122,6 +125,7 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <TextBlock Text="Ticket" FontWeight="SemiBold" />
                     <Grid Grid.Row="1" Grid.IsSharedSizeScope="True">
@@ -143,20 +147,91 @@
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <Grid Margin="4">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" SharedSizeGroup="TicketItem" />
-                                            <ColumnDefinition Width="60" SharedSizeGroup="TicketQty" />
-                                            <ColumnDefinition Width="90" SharedSizeGroup="TicketPrice" />
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock Text="{Binding NameSnapshot}" FontWeight="SemiBold" />
-                                        <TextBlock Grid.Column="1" Text="{Binding Qty}" TextAlignment="Right" />
-                                        <TextBlock Grid.Column="2" Text="{Binding LineTotalCents}" TextAlignment="Right" />
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <Grid Grid.Row="0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" SharedSizeGroup="TicketItem" />
+                                                <ColumnDefinition Width="60" SharedSizeGroup="TicketQty" />
+                                                <ColumnDefinition Width="90" SharedSizeGroup="TicketPrice" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="{Binding NameSnapshot}" FontWeight="SemiBold" />
+                                            <TextBlock Grid.Column="1" Text="{Binding Qty}" TextAlignment="Right" />
+                                            <TextBlock Grid.Column="2" Text="{Binding LineTotalCents}" TextAlignment="Right" />
+                                        </Grid>
+                                        <ItemsControl Grid.Row="1" ItemsSource="{Binding Customizations}" Margin="0,2,0,0">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Margin="0,2,0,0" FontSize="11" Foreground="#666666">
+                                                        <TextBlock.Text>
+                                                            <MultiBinding Converter="{StaticResource CustomizationDisplayConverter}">
+                                                                <Binding Path="NameSnapshot" />
+                                                                <Binding Path="PriceCents" />
+                                                            </MultiBinding>
+                                                        </TextBlock.Text>
+                                                    </TextBlock>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
                                     </Grid>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
                     </Grid>
-                    <Button Grid.Row="2" Content="Remove Item" Margin="0,8,0,0" Height="32" Click="RemoveItemButton_OnClick" />
+                    <Grid Grid.Row="2" Margin="0,8,0,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Customizations" FontWeight="SemiBold" />
+                        <Grid Grid.Row="1" Margin="0,6,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Available" FontSize="12" />
+                                <ListBox x:Name="CustomizationsList" Height="110" SelectionChanged="CustomizationsList_OnSelectionChanged" PreviewMouseLeftButtonUp="CustomizationsList_OnItemTapped">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="4">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="80" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="{Binding Name}" />
+                                                <TextBlock Grid.Column="1" Text="{Binding PriceCents}" TextAlignment="Right" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                                <Button x:Name="AddCustomizationButton" Content="Add Customization" Margin="0,6,0,0" Height="30" Click="AddCustomizationButton_OnClick" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Margin="12,0,0,0">
+                                <TextBlock Text="Applied" FontSize="12" />
+                                <ListBox x:Name="SelectedCustomizationsList" Height="110" SelectionChanged="SelectedCustomizationsList_OnSelectionChanged" PreviewMouseLeftButtonUp="SelectedCustomizationsList_OnItemTapped">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="4">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="80" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="{Binding NameSnapshot}" />
+                                                <TextBlock Grid.Column="1" Text="{Binding PriceCents}" TextAlignment="Right" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                                <Button x:Name="RemoveCustomizationButton" Content="Remove Customization" Margin="0,6,0,0" Height="30" Click="RemoveCustomizationButton_OnClick" />
+                            </StackPanel>
+                        </Grid>
+                        <TextBlock x:Name="CustomizationStatusText" Grid.Row="2" Margin="0,6,0,0" Foreground="DarkRed" TextWrapping="Wrap" />
+                    </Grid>
+                    <Button Grid.Row="3" Content="Remove Item" Margin="0,8,0,0" Height="32" Click="RemoveItemButton_OnClick" />
                 </Grid>
             </Grid>
 
@@ -249,14 +324,34 @@
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
                                         <Grid Margin="4">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*" SharedSizeGroup="ReceiptItem" />
-                                                <ColumnDefinition Width="60" SharedSizeGroup="ReceiptQty" />
-                                                <ColumnDefinition Width="90" SharedSizeGroup="ReceiptPrice" />
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Text="{Binding NameSnapshot}" />
-                                            <TextBlock Grid.Column="1" Text="{Binding Qty}" TextAlignment="Right" />
-                                            <TextBlock Grid.Column="2" Text="{Binding LineTotalCents}" TextAlignment="Right" />
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+                                            <Grid Grid.Row="0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" SharedSizeGroup="ReceiptItem" />
+                                                    <ColumnDefinition Width="60" SharedSizeGroup="ReceiptQty" />
+                                                    <ColumnDefinition Width="90" SharedSizeGroup="ReceiptPrice" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="{Binding NameSnapshot}" />
+                                                <TextBlock Grid.Column="1" Text="{Binding Qty}" TextAlignment="Right" />
+                                                <TextBlock Grid.Column="2" Text="{Binding LineTotalCents}" TextAlignment="Right" />
+                                            </Grid>
+                                            <ItemsControl Grid.Row="1" ItemsSource="{Binding Customizations}" Margin="0,2,0,0">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Margin="0,2,0,0" FontSize="11" Foreground="#666666">
+                                                            <TextBlock.Text>
+                                                                <MultiBinding Converter="{StaticResource CustomizationDisplayConverter}">
+                                                                    <Binding Path="NameSnapshot" />
+                                                                    <Binding Path="PriceCents" />
+                                                                </MultiBinding>
+                                                            </TextBlock.Text>
+                                                        </TextBlock>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
                                         </Grid>
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>
@@ -514,6 +609,49 @@
                             </TextBox>
                             <Button Content="Add Item" Margin="0,12,0,0" Height="32" Click="AddMenuItemButton_OnClick" />
                             <TextBlock x:Name="MenuItemStatusText" Margin="0,8,0,0" Foreground="DarkRed" TextWrapping="Wrap" />
+                        </StackPanel>
+                    </Grid>
+                </TabItem>
+
+                <TabItem Header="Customizations">
+                    <Grid Margin="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                            <TextBlock Text="Existing Customizations" FontWeight="SemiBold" />
+                            <ListBox x:Name="AdminCustomizationsList" Height="320">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="4">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="80" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="{Binding Name}" />
+                                            <TextBlock Grid.Column="1" Text="{Binding PriceCents}" TextAlignment="Right" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="Add Customization" FontWeight="SemiBold" />
+                            <TextBlock Text="Name" Margin="0,8,0,0" />
+                            <TextBox x:Name="CustomizationNameBox" Height="30" />
+                            <TextBlock Text="Price (cents)" Margin="0,8,0,0" />
+                            <TextBox x:Name="CustomizationPriceBox" Height="30">
+                                <TextBox.InputScope>
+                                    <InputScope>
+                                        <InputScope.Names>
+                                            <InputScopeName NameValue="Number" />
+                                        </InputScope.Names>
+                                    </InputScope>
+                                </TextBox.InputScope>
+                            </TextBox>
+                            <Button Content="Add Customization" Margin="0,12,0,0" Height="32" Click="AddCustomizationItemButton_OnClick" />
+                            <TextBlock x:Name="CustomizationAdminStatusText" Margin="0,8,0,0" Foreground="DarkRed" TextWrapping="Wrap" />
                         </StackPanel>
                     </Grid>
                 </TabItem>

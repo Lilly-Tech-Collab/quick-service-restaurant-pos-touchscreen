@@ -10,4 +10,5 @@ public class OrderItem
     public int Qty { get; set; }
     public int LineTotalCents { get; set; }
     public string? Notes { get; set; }
+    public List<OrderItemCustomization> Customizations { get; set; } = new();
 }

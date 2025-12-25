@@ -23,6 +23,9 @@ public static class DataSeeder
     private static readonly Guid ItemLemonadeId = Guid.Parse("f439a2a4-0f6e-4f2b-9c5b-7cb1a20d8c7e");
     private static readonly Guid ItemIcedTeaId = Guid.Parse("1a80d413-98fd-4aac-a785-7e4a84a1ed9c");
     private static readonly Guid ItemWaterId = Guid.Parse("9f7d4d8d-1f6d-4c46-9ce0-4b5d7b8f9d1a");
+    private static readonly Guid CustomizationNoCheeseId = Guid.Parse("f4a7e147-93a6-47de-9cc9-1706e3f54f90");
+    private static readonly Guid CustomizationExtraCheeseId = Guid.Parse("6f1f0fd3-1224-4bcf-9f7e-93694dc43071");
+    private static readonly Guid CustomizationExtraSauceId = Guid.Parse("7b1d6c2a-7d8f-4d6e-8071-71e483f3c4c6");
 
     public static readonly User[] Users =
     {
@@ -162,6 +165,31 @@ public static class DataSeeder
             Name = "Bottled Water",
             PriceCents = 149,
             TaxRateBps = 0,
+            IsActive = true
+        }
+    };
+
+    public static readonly CustomizationItem[] CustomizationItems =
+    {
+        new()
+        {
+            Id = CustomizationNoCheeseId,
+            Name = "No Cheese",
+            PriceCents = 0,
+            IsActive = true
+        },
+        new()
+        {
+            Id = CustomizationExtraCheeseId,
+            Name = "Extra Cheese",
+            PriceCents = 50,
+            IsActive = true
+        },
+        new()
+        {
+            Id = CustomizationExtraSauceId,
+            Name = "Extra Sauce",
+            PriceCents = 25,
             IsActive = true
         }
     };

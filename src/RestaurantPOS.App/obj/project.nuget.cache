@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "8NZ5IUisZFo=",
+  "dgSpecHash": "Jk6mZc6Tqrk=",
   "success": true,
-  "projectFilePath": "C:\\LillyTech\\poc\\touchscreen\\src\\RestaurantPOS.App\\RestaurantPOS.App.csproj",
+  "projectFilePath": "C:\\Users\\ganap\\source\\repos\\quick-service-restaurant-pos-touchscreen\\src\\RestaurantPOS.App\\RestaurantPOS.App.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\ganap\\.nuget\\packages\\microsoft.data.sqlite.core\\9.0.1\\microsoft.data.sqlite.core.9.0.1.nupkg.sha512",
     "C:\\Users\\ganap\\.nuget\\packages\\microsoft.entityframeworkcore\\9.0.1\\microsoft.entityframeworkcore.9.0.1.nupkg.sha512",

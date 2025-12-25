@@ -10,8 +10,10 @@ public class AppDbContext : DbContext
     public DbSet<User> Users => Set<User>();
     public DbSet<MenuCategory> MenuCategories => Set<MenuCategory>();
     public DbSet<MenuItem> MenuItems => Set<MenuItem>();
+    public DbSet<CustomizationItem> CustomizationItems => Set<CustomizationItem>();
     public DbSet<Order> Orders => Set<Order>();
     public DbSet<OrderItem> OrderItems => Set<OrderItem>();
+    public DbSet<OrderItemCustomization> OrderItemCustomizations => Set<OrderItemCustomization>();
     public DbSet<Payment> Payments => Set<Payment>();
 
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
@@ -63,6 +65,15 @@ public class AppDbContext : DbContext
                 .OnDelete(DeleteBehavior.Restrict);
         });
 
+        modelBuilder.Entity<CustomizationItem>(e =>
+        {
+            e.ToTable("CustomizationItems");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.Name).IsRequired().HasMaxLength(200);
+            e.Property(x => x.PriceCents).IsRequired();
+            e.Property(x => x.IsActive).IsRequired();
+        });
+
         modelBuilder.Entity<Order>(e =>
         {
             e.ToTable("Orders");
@@ -97,6 +108,22 @@ public class AppDbContext : DbContext
                 .WithMany()
                 .HasForeignKey(x => x.MenuItemId)
                 .OnDelete(DeleteBehavior.Restrict);
+            e.HasMany(x => x.Customizations)
+                .WithOne()
+                .HasForeignKey(x => x.OrderItemId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<OrderItemCustomization>(e =>
+        {
+            e.ToTable("OrderItemCustomizations");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.NameSnapshot).IsRequired().HasMaxLength(200);
+            e.Property(x => x.PriceCents).IsRequired();
+            e.HasOne<CustomizationItem>()
+                .WithMany()
+                .HasForeignKey(x => x.CustomizationItemId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<Payment>(e =>
@@ -112,5 +139,6 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<AppSetting>().HasData(DataSeeder.AppSettings);
         modelBuilder.Entity<MenuCategory>().HasData(DataSeeder.Categories);
         modelBuilder.Entity<MenuItem>().HasData(DataSeeder.MenuItems);
+        modelBuilder.Entity<CustomizationItem>().HasData(DataSeeder.CustomizationItems);
     }
 }

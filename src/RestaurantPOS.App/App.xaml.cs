@@ -30,6 +30,7 @@ public partial class App : System.Windows.Application
                 services.AddSingleton<MainWindow>();
                 services.AddTransient<AuthService>();
                 services.AddTransient<MenuService>();
+                services.AddTransient<CustomizationService>();
                 services.AddTransient<OrderService>();
                 services.AddTransient<PaymentService>();
                 services.AddTransient<ReportService>();
