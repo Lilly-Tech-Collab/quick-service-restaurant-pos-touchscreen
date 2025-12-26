@@ -40,6 +40,44 @@ public class UserService
         return user;
     }
 
+    public async Task<User?> UpdateUserAsync(Guid userId, string displayName, string? pin, UserRole role, bool isActive)
+    {
+        var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == userId);
+        if (user is null)
+        {
+            return null;
+        }
+
+        user.DisplayName = displayName.Trim();
+        if (!string.IsNullOrWhiteSpace(pin))
+        {
+            user.PinHash = ComputePinHash(pin);
+        }
+        user.Role = role;
+        user.IsActive = isActive;
+        await _db.SaveChangesAsync();
+        return user;
+    }
+
+    public async Task<bool> DeleteUserAsync(Guid userId)
+    {
+        var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == userId);
+        if (user is null)
+        {
+            return false;
+        }
+
+        var hasOrders = await _db.Orders.AnyAsync(o => o.CreatedByUserId == userId);
+        if (hasOrders)
+        {
+            return false;
+        }
+
+        _db.Users.Remove(user);
+        await _db.SaveChangesAsync();
+        return true;
+    }
+
     private static string ComputePinHash(string pin)
     {
         using var sha = SHA256.Create();

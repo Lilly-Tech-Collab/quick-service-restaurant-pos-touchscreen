@@ -2246,6 +2246,7 @@
   "projectFileDependencyGroups": {
     "net9.0-windows7.0": [
       "Microsoft.EntityFrameworkCore >= 9.0.1",
+      "Microsoft.EntityFrameworkCore.Relational >= 9.0.1",
       "Microsoft.EntityFrameworkCore.Sqlite >= 9.0.1",
       "Microsoft.Extensions.Configuration.Json >= 9.0.1",
       "Microsoft.Extensions.DependencyInjection >= 9.0.1",
@@ -2309,6 +2310,10 @@
         "targetAlias": "net9.0-windows",
         "dependencies": {
           "Microsoft.EntityFrameworkCore": {
+            "target": "Package",
+            "version": "[9.0.1, )"
+          },
+          "Microsoft.EntityFrameworkCore.Relational": {
             "target": "Package",
             "version": "[9.0.1, )"
           },

@@ -30,17 +30,51 @@ public class CustomizationService
             .ToListAsync();
     }
 
-    public async Task<CustomizationItem> AddCustomizationAsync(string name, int priceCents)
+    public async Task<CustomizationItem> AddCustomizationAsync(string name, int priceCents, bool isActive)
     {
         var item = new CustomizationItem
         {
             Name = name.Trim(),
             PriceCents = priceCents,
-            IsActive = true
+            IsActive = isActive
         };
 
         _db.CustomizationItems.Add(item);
         await _db.SaveChangesAsync();
         return item;
+    }
+
+    public async Task<CustomizationItem?> UpdateCustomizationAsync(Guid customizationId, string name, int priceCents, bool isActive)
+    {
+        var item = await _db.CustomizationItems.FirstOrDefaultAsync(c => c.Id == customizationId);
+        if (item is null)
+        {
+            return null;
+        }
+
+        item.Name = name.Trim();
+        item.PriceCents = priceCents;
+        item.IsActive = isActive;
+        await _db.SaveChangesAsync();
+        return item;
+    }
+
+    public async Task<bool> DeleteCustomizationAsync(Guid customizationId)
+    {
+        var item = await _db.CustomizationItems.FirstOrDefaultAsync(c => c.Id == customizationId);
+        if (item is null)
+        {
+            return false;
+        }
+
+        var hasOrders = await _db.OrderItemCustomizations.AnyAsync(c => c.CustomizationItemId == customizationId);
+        if (hasOrders)
+        {
+            return false;
+        }
+
+        _db.CustomizationItems.Remove(item);
+        await _db.SaveChangesAsync();
+        return true;
     }
 }

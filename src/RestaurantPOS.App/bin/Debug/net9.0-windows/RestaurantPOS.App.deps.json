@@ -9,6 +9,7 @@
       "RestaurantPOS.App/1.0.0": {
         "dependencies": {
           "Microsoft.EntityFrameworkCore": "9.0.1",
+          "Microsoft.EntityFrameworkCore.Relational": "9.0.1",
           "Microsoft.EntityFrameworkCore.Sqlite": "9.0.1",
           "Microsoft.Extensions.Configuration.Json": "9.0.1",
           "Microsoft.Extensions.DependencyInjection": "9.0.1",

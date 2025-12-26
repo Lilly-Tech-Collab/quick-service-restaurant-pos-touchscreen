@@ -25,8 +25,7 @@ public partial class App : System.Windows.Application
             .ConfigureServices((ctx, services) =>
             {
                 var cs = ctx.Configuration.GetConnectionString("PosDb")!;
-                services.AddDbContext<AppDbContext>(opt =>
-                    opt.UseSqlite(cs).UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));
+                services.AddDbContext<AppDbContext>(opt => opt.UseSqlite(cs));
 
                 services.AddSingleton<MainWindow>();
                 services.AddTransient<AuthService>();

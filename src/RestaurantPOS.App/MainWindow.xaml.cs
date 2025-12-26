@@ -33,6 +33,10 @@ public partial class MainWindow : Window
     private CustomizationItem? _selectedCustomizationItem;
     private OrderItemCustomization? _selectedOrderCustomization;
     private bool _isUpdatingTicketSelection;
+    private MenuCategory? _selectedAdminCategory;
+    private MenuItemEntity? _selectedAdminMenuItem;
+    private CustomizationItem? _selectedAdminCustomization;
+    private User? _selectedAdminUser;
 
     public ObservableCollection<MenuCategory> Categories { get; } = new();
     public ObservableCollection<MenuItemEntity> MenuItems { get; } = new();
@@ -628,10 +632,80 @@ public partial class MainWindow : Window
             return;
         }
 
-        await _menuService.AddCategoryAsync(name, sortOrder);
+        var isActive = CategoryActiveCheck.IsChecked ?? true;
+        await _menuService.AddCategoryAsync(name, sortOrder, isActive);
         CategoryNameBox.Text = string.Empty;
         CategorySortOrderBox.Text = string.Empty;
+        CategoryActiveCheck.IsChecked = true;
         CategoryStatusText.Text = "Category added.";
+        await RefreshAdminDataAsync();
+        await LoadMenuAsync();
+    }
+
+    private async void UpdateCategoryButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (_selectedAdminCategory is null)
+        {
+            CategoryStatusText.Text = "Select a category to update.";
+            return;
+        }
+
+        var name = CategoryNameBox.Text.Trim();
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            CategoryStatusText.Text = "Enter a category name.";
+            return;
+        }
+
+        var sortOrderText = CategorySortOrderBox.Text.Trim();
+        var sortOrder = 0;
+        if (!string.IsNullOrWhiteSpace(sortOrderText) && !int.TryParse(sortOrderText, out sortOrder))
+        {
+            CategoryStatusText.Text = "Sort order must be a number.";
+            return;
+        }
+
+        var isActive = CategoryActiveCheck.IsChecked ?? true;
+        await _menuService.UpdateCategoryAsync(_selectedAdminCategory.Id, name, sortOrder, isActive);
+        CategoryStatusText.Text = "Category updated.";
+        await RefreshAdminDataAsync();
+        await LoadMenuAsync();
+    }
+
+    private async void DeactivateCategoryButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (_selectedAdminCategory is null)
+        {
+            CategoryStatusText.Text = "Select a category to deactivate.";
+            return;
+        }
+
+        await _menuService.UpdateCategoryAsync(
+            _selectedAdminCategory.Id,
+            _selectedAdminCategory.Name,
+            _selectedAdminCategory.SortOrder,
+            false);
+        CategoryStatusText.Text = "Category deactivated.";
+        await RefreshAdminDataAsync();
+        await LoadMenuAsync();
+    }
+
+    private async void DeleteCategoryButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (_selectedAdminCategory is null)
+        {
+            CategoryStatusText.Text = "Select a category to delete.";
+            return;
+        }
+
+        var deleted = await _menuService.DeleteCategoryAsync(_selectedAdminCategory.Id);
+        if (!deleted)
+        {
+            CategoryStatusText.Text = "Cannot delete category with menu items.";
+            return;
+        }
+
+        CategoryStatusText.Text = "Category deleted.";
         await RefreshAdminDataAsync();
         await LoadMenuAsync();
     }
@@ -666,11 +740,96 @@ public partial class MainWindow : Window
             return;
         }
 
-        await _menuService.AddMenuItemAsync(category.Id, name, priceCents, taxBps);
+        var isActive = MenuItemActiveCheck.IsChecked ?? true;
+        await _menuService.AddMenuItemAsync(category.Id, name, priceCents, taxBps, isActive);
         MenuItemNameBox.Text = string.Empty;
         MenuItemPriceBox.Text = string.Empty;
         MenuItemTaxBox.Text = string.Empty;
+        MenuItemActiveCheck.IsChecked = true;
         MenuItemStatusText.Text = "Menu item added.";
+        await RefreshAdminDataAsync();
+        await LoadMenuAsync();
+    }
+
+    private async void UpdateMenuItemButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (_selectedAdminMenuItem is null)
+        {
+            MenuItemStatusText.Text = "Select a menu item to update.";
+            return;
+        }
+
+        var category = MenuItemCategoryCombo.SelectedItem as MenuCategory;
+        var name = MenuItemNameBox.Text.Trim();
+        if (category is null)
+        {
+            MenuItemStatusText.Text = "Select a category.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            MenuItemStatusText.Text = "Enter a menu item name.";
+            return;
+        }
+
+        if (!int.TryParse(MenuItemPriceBox.Text.Trim(), out var priceCents))
+        {
+            MenuItemStatusText.Text = "Price must be an integer number of cents.";
+            return;
+        }
+
+        var taxBps = 0;
+        var taxText = MenuItemTaxBox.Text.Trim();
+        if (!string.IsNullOrWhiteSpace(taxText) && !int.TryParse(taxText, out taxBps))
+        {
+            MenuItemStatusText.Text = "Tax rate must be an integer in basis points.";
+            return;
+        }
+
+        var isActive = MenuItemActiveCheck.IsChecked ?? true;
+        await _menuService.UpdateMenuItemAsync(_selectedAdminMenuItem.Id, category.Id, name, priceCents, taxBps, isActive);
+        MenuItemStatusText.Text = "Menu item updated.";
+        await RefreshAdminDataAsync();
+        await LoadMenuAsync();
+    }
+
+    private async void DeactivateMenuItemButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (_selectedAdminMenuItem is null)
+        {
+            MenuItemStatusText.Text = "Select a menu item to deactivate.";
+            return;
+        }
+
+        await _menuService.UpdateMenuItemAsync(
+            _selectedAdminMenuItem.Id,
+            _selectedAdminMenuItem.CategoryId,
+            _selectedAdminMenuItem.Name,
+            _selectedAdminMenuItem.PriceCents,
+            _selectedAdminMenuItem.TaxRateBps,
+            false);
+        MenuItemStatusText.Text = "Menu item deactivated.";
+        await RefreshAdminDataAsync();
+        await LoadMenuAsync();
+    }
+
+    private async void DeleteMenuItemButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (_selectedAdminMenuItem is null)
+        {
+            MenuItemStatusText.Text = "Select a menu item to delete.";
+            return;
+        }
+
+        var deleted = await _menuService.DeleteMenuItemAsync(_selectedAdminMenuItem.Id);
+        if (!deleted)
+        {
+            MenuItemStatusText.Text = "Cannot delete menu item with orders.";
+            return;
+        }
+
+        MenuItemStatusText.Text = "Menu item deleted.";
         await RefreshAdminDataAsync();
         await LoadMenuAsync();
     }
@@ -690,10 +849,78 @@ public partial class MainWindow : Window
             return;
         }
 
-        await _customizationService.AddCustomizationAsync(name, priceCents);
+        var isActive = CustomizationActiveCheck.IsChecked ?? true;
+        await _customizationService.AddCustomizationAsync(name, priceCents, isActive);
         CustomizationNameBox.Text = string.Empty;
         CustomizationPriceBox.Text = string.Empty;
+        CustomizationActiveCheck.IsChecked = true;
         CustomizationAdminStatusText.Text = "Customization added.";
+        await RefreshAdminDataAsync();
+        await LoadCustomizationsAsync();
+    }
+
+    private async void UpdateCustomizationItemButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (_selectedAdminCustomization is null)
+        {
+            CustomizationAdminStatusText.Text = "Select a customization to update.";
+            return;
+        }
+
+        var name = CustomizationNameBox.Text.Trim();
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            CustomizationAdminStatusText.Text = "Enter a customization name.";
+            return;
+        }
+
+        if (!int.TryParse(CustomizationPriceBox.Text.Trim(), out var priceCents))
+        {
+            CustomizationAdminStatusText.Text = "Price must be an integer number of cents.";
+            return;
+        }
+
+        var isActive = CustomizationActiveCheck.IsChecked ?? true;
+        await _customizationService.UpdateCustomizationAsync(_selectedAdminCustomization.Id, name, priceCents, isActive);
+        CustomizationAdminStatusText.Text = "Customization updated.";
+        await RefreshAdminDataAsync();
+        await LoadCustomizationsAsync();
+    }
+
+    private async void DeactivateCustomizationItemButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (_selectedAdminCustomization is null)
+        {
+            CustomizationAdminStatusText.Text = "Select a customization to deactivate.";
+            return;
+        }
+
+        await _customizationService.UpdateCustomizationAsync(
+            _selectedAdminCustomization.Id,
+            _selectedAdminCustomization.Name,
+            _selectedAdminCustomization.PriceCents,
+            false);
+        CustomizationAdminStatusText.Text = "Customization deactivated.";
+        await RefreshAdminDataAsync();
+        await LoadCustomizationsAsync();
+    }
+
+    private async void DeleteCustomizationItemButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (_selectedAdminCustomization is null)
+        {
+            CustomizationAdminStatusText.Text = "Select a customization to delete.";
+            return;
+        }
+
+        var deleted = await _customizationService.DeleteCustomizationAsync(_selectedAdminCustomization.Id);
+        if (!deleted)
+        {
+            CustomizationAdminStatusText.Text = "Cannot delete customization with orders.";
+            return;
+        }
+
+        CustomizationAdminStatusText.Text = "Customization deleted.";
         await RefreshAdminDataAsync();
         await LoadCustomizationsAsync();
     }
@@ -725,6 +952,70 @@ public partial class MainWindow : Window
         UserRoleCombo.SelectedItem = UserRole.Cashier;
         UserActiveCheck.IsChecked = true;
         UserStatusText.Text = "User added.";
+        await RefreshAdminDataAsync();
+    }
+
+    private async void UpdateUserButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (_selectedAdminUser is null)
+        {
+            UserStatusText.Text = "Select a user to update.";
+            return;
+        }
+
+        var displayName = UserNameBox.Text.Trim();
+        if (string.IsNullOrWhiteSpace(displayName))
+        {
+            UserStatusText.Text = "Enter a display name.";
+            return;
+        }
+
+        var role = UserRoleCombo.SelectedItem is UserRole selected
+            ? selected
+            : UserRole.Cashier;
+        var isActive = UserActiveCheck.IsChecked ?? true;
+        var pin = UserPinBox.Password.Trim();
+
+        await _userService.UpdateUserAsync(_selectedAdminUser.Id, displayName, pin, role, isActive);
+        UserPinBox.Password = string.Empty;
+        UserStatusText.Text = "User updated.";
+        await RefreshAdminDataAsync();
+    }
+
+    private async void DeactivateUserButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (_selectedAdminUser is null)
+        {
+            UserStatusText.Text = "Select a user to deactivate.";
+            return;
+        }
+
+        await _userService.UpdateUserAsync(
+            _selectedAdminUser.Id,
+            _selectedAdminUser.DisplayName,
+            null,
+            _selectedAdminUser.Role,
+            false);
+        UserStatusText.Text = "User deactivated.";
+        await RefreshAdminDataAsync();
+    }
+
+    private async void DeleteUserButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (_selectedAdminUser is null)
+        {
+            UserStatusText.Text = "Select a user to delete.";
+            return;
+        }
+
+        var deleted = await _userService.DeleteUserAsync(_selectedAdminUser.Id);
+        if (!deleted)
+        {
+            UserStatusText.Text = "Cannot delete user with orders.";
+            return;
+        }
+
+        UserStatusText.Text = "User deleted.";
         await RefreshAdminDataAsync();
     }
 
@@ -885,6 +1176,11 @@ public partial class MainWindow : Window
         UserStatusText.Text = string.Empty;
         RestaurantNameStatusText.Text = string.Empty;
 
+        var selectedCategoryId = (AdminCategoriesList.SelectedItem as MenuCategory)?.Id;
+        var selectedMenuItemId = (AdminMenuItemsList.SelectedItem as MenuItemEntity)?.Id;
+        var selectedCustomizationId = (AdminCustomizationsList.SelectedItem as CustomizationItem)?.Id;
+        var selectedUserId = (AdminUsersList.SelectedItem as User)?.Id;
+
         AdminCategories.Clear();
         var categories = await _menuService.GetAllCategoriesAsync();
         foreach (var category in categories)
@@ -918,6 +1214,91 @@ public partial class MainWindow : Window
         {
             MenuItemCategoryCombo.SelectedItem = AdminCategories[0];
         }
+
+        if (selectedCategoryId.HasValue)
+        {
+            AdminCategoriesList.SelectedItem = AdminCategories.FirstOrDefault(c => c.Id == selectedCategoryId.Value);
+        }
+
+        if (selectedMenuItemId.HasValue)
+        {
+            AdminMenuItemsList.SelectedItem = AdminMenuItems.FirstOrDefault(i => i.Id == selectedMenuItemId.Value);
+        }
+
+        if (selectedCustomizationId.HasValue)
+        {
+            AdminCustomizationsList.SelectedItem = AdminCustomizations.FirstOrDefault(c => c.Id == selectedCustomizationId.Value);
+        }
+
+        if (selectedUserId.HasValue)
+        {
+            AdminUsersList.SelectedItem = AdminUsers.FirstOrDefault(u => u.Id == selectedUserId.Value);
+        }
+    }
+
+    private void AdminCategoriesList_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        _selectedAdminCategory = AdminCategoriesList.SelectedItem as MenuCategory;
+        if (_selectedAdminCategory is null)
+        {
+            return;
+        }
+
+        CategoryNameBox.Text = _selectedAdminCategory.Name;
+        CategorySortOrderBox.Text = _selectedAdminCategory.SortOrder.ToString();
+        CategoryActiveCheck.IsChecked = _selectedAdminCategory.IsActive;
+        CategoryStatusText.Text = string.Empty;
+    }
+
+    private void AdminMenuItemsList_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        _selectedAdminMenuItem = AdminMenuItemsList.SelectedItem as MenuItemEntity;
+        if (_selectedAdminMenuItem is null)
+        {
+            return;
+        }
+
+        MenuItemNameBox.Text = _selectedAdminMenuItem.Name;
+        MenuItemPriceBox.Text = _selectedAdminMenuItem.PriceCents.ToString();
+        MenuItemTaxBox.Text = _selectedAdminMenuItem.TaxRateBps.ToString();
+        MenuItemActiveCheck.IsChecked = _selectedAdminMenuItem.IsActive;
+
+        var category = AdminCategories.FirstOrDefault(c => c.Id == _selectedAdminMenuItem.CategoryId);
+        if (category is not null)
+        {
+            MenuItemCategoryCombo.SelectedItem = category;
+        }
+
+        MenuItemStatusText.Text = string.Empty;
+    }
+
+    private void AdminCustomizationsList_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        _selectedAdminCustomization = AdminCustomizationsList.SelectedItem as CustomizationItem;
+        if (_selectedAdminCustomization is null)
+        {
+            return;
+        }
+
+        CustomizationNameBox.Text = _selectedAdminCustomization.Name;
+        CustomizationPriceBox.Text = _selectedAdminCustomization.PriceCents.ToString();
+        CustomizationActiveCheck.IsChecked = _selectedAdminCustomization.IsActive;
+        CustomizationAdminStatusText.Text = string.Empty;
+    }
+
+    private void AdminUsersList_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        _selectedAdminUser = AdminUsersList.SelectedItem as User;
+        if (_selectedAdminUser is null)
+        {
+            return;
+        }
+
+        UserNameBox.Text = _selectedAdminUser.DisplayName;
+        UserPinBox.Password = string.Empty;
+        UserRoleCombo.SelectedItem = _selectedAdminUser.Role;
+        UserActiveCheck.IsChecked = _selectedAdminUser.IsActive;
+        UserStatusText.Text = string.Empty;
     }
 
     private void UpdateSelectedOrderCustomizations(OrderItem? orderItem)
