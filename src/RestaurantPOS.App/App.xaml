@@ -9,27 +9,32 @@
 
         <Style TargetType="Button">
             <Setter Property="FontSize" Value="16" />
-            <Setter Property="MinHeight" Value="44" />
+            <Setter Property="MinHeight" Value="48" />
             <Setter Property="MinWidth" Value="90" />
-            <Setter Property="Padding" Value="16,8" />
+            <Setter Property="Padding" Value="18,10" />
         </Style>
 
         <Style TargetType="TextBox">
             <Setter Property="FontSize" Value="16" />
-            <Setter Property="MinHeight" Value="40" />
-            <Setter Property="Padding" Value="8,6" />
+            <Setter Property="MinHeight" Value="44" />
+            <Setter Property="Padding" Value="10,8" />
         </Style>
 
         <Style TargetType="PasswordBox">
             <Setter Property="FontSize" Value="16" />
-            <Setter Property="MinHeight" Value="40" />
-            <Setter Property="Padding" Value="8,6" />
+            <Setter Property="MinHeight" Value="44" />
+            <Setter Property="Padding" Value="10,8" />
         </Style>
 
         <Style TargetType="ComboBox">
             <Setter Property="FontSize" Value="16" />
-            <Setter Property="MinHeight" Value="40" />
-            <Setter Property="Padding" Value="8,4" />
+            <Setter Property="MinHeight" Value="44" />
+            <Setter Property="Padding" Value="10,6" />
+        </Style>
+
+        <Style TargetType="ComboBoxItem">
+            <Setter Property="MinHeight" Value="44" />
+            <Setter Property="Padding" Value="10,6" />
         </Style>
 
         <Style TargetType="ListBox">
@@ -40,8 +45,8 @@
         </Style>
 
         <Style TargetType="ListBoxItem">
-            <Setter Property="MinHeight" Value="44" />
-            <Setter Property="Padding" Value="10,6" />
+            <Setter Property="MinHeight" Value="52" />
+            <Setter Property="Padding" Value="12,8" />
         </Style>
 
         <Style TargetType="ListView">
@@ -52,8 +57,13 @@
         </Style>
 
         <Style TargetType="ListViewItem">
-            <Setter Property="MinHeight" Value="44" />
-            <Setter Property="Padding" Value="10,6" />
+            <Setter Property="MinHeight" Value="52" />
+            <Setter Property="Padding" Value="12,8" />
+        </Style>
+
+        <Style TargetType="ScrollBar">
+            <Setter Property="Width" Value="18" />
+            <Setter Property="Height" Value="18" />
         </Style>
 
         <Style TargetType="Menu">
