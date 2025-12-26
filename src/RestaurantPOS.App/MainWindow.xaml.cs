@@ -281,12 +281,22 @@ public partial class MainWindow : Window
 
     private async void MenuItemsList_OnItemTapped(object sender, MouseButtonEventArgs e)
     {
+        await HandleMenuItemTappedAsync(e.OriginalSource);
+    }
+
+    private async void MenuItemsList_OnItemTouched(object sender, TouchEventArgs e)
+    {
+        await HandleMenuItemTappedAsync(e.OriginalSource);
+    }
+
+    private async Task HandleMenuItemTappedAsync(object originalSource)
+    {
         if (_currentOrder is null)
         {
             return;
         }
 
-        var selectedItem = GetItemFromEvent<MenuItemEntity>(MenuItemsList, e.OriginalSource);
+        var selectedItem = GetItemFromEvent<MenuItemEntity>(MenuItemsList, originalSource);
         if (selectedItem is null)
         {
             return;
@@ -313,7 +323,17 @@ public partial class MainWindow : Window
 
     private async void TicketItemsList_OnItemTapped(object sender, MouseButtonEventArgs e)
     {
-        var selectedItem = GetItemFromEvent<OrderItem>(TicketItemsList, e.OriginalSource);
+        await HandleTicketItemTappedAsync(e.OriginalSource);
+    }
+
+    private async void TicketItemsList_OnItemTouched(object sender, TouchEventArgs e)
+    {
+        await HandleTicketItemTappedAsync(e.OriginalSource);
+    }
+
+    private async Task HandleTicketItemTappedAsync(object originalSource)
+    {
+        var selectedItem = GetItemFromEvent<OrderItem>(TicketItemsList, originalSource);
         if (selectedItem is null)
         {
             return;
@@ -435,6 +455,16 @@ public partial class MainWindow : Window
 
     private async void CustomizationsList_OnItemTapped(object sender, MouseButtonEventArgs e)
     {
+        await HandleCustomizationTappedAsync(e.OriginalSource);
+    }
+
+    private async void CustomizationsList_OnItemTouched(object sender, TouchEventArgs e)
+    {
+        await HandleCustomizationTappedAsync(e.OriginalSource);
+    }
+
+    private async Task HandleCustomizationTappedAsync(object originalSource)
+    {
         if (_currentOrder is null)
         {
             return;
@@ -446,7 +476,7 @@ public partial class MainWindow : Window
             return;
         }
 
-        var selectedCustomization = GetItemFromEvent<CustomizationItem>(CustomizationsList, e.OriginalSource);
+        var selectedCustomization = GetItemFromEvent<CustomizationItem>(CustomizationsList, originalSource);
         if (selectedCustomization is null)
         {
             return;
@@ -489,6 +519,16 @@ public partial class MainWindow : Window
 
     private async void SelectedCustomizationsList_OnItemTapped(object sender, MouseButtonEventArgs e)
     {
+        await HandleSelectedCustomizationTappedAsync(e.OriginalSource);
+    }
+
+    private async void SelectedCustomizationsList_OnItemTouched(object sender, TouchEventArgs e)
+    {
+        await HandleSelectedCustomizationTappedAsync(e.OriginalSource);
+    }
+
+    private async Task HandleSelectedCustomizationTappedAsync(object originalSource)
+    {
         if (_currentOrder is null)
         {
             return;
@@ -500,7 +540,7 @@ public partial class MainWindow : Window
             return;
         }
 
-        var selectedCustomization = GetItemFromEvent<OrderItemCustomization>(SelectedCustomizationsList, e.OriginalSource);
+        var selectedCustomization = GetItemFromEvent<OrderItemCustomization>(SelectedCustomizationsList, originalSource);
         if (selectedCustomization is null)
         {
             return;
