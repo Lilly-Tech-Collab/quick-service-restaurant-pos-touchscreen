@@ -54,6 +54,8 @@ public partial class MainWindow : Window
     public ObservableCollection<ReportCategoryRow> ReportCategorySales { get; } = new();
     public ObservableCollection<ReportTopItemRow> ReportTopItems { get; } = new();
     public ObservableCollection<ReportHourlyRow> ReportHourlySales { get; } = new();
+    public ObservableCollection<RecentOrderRow> RecentOrders { get; } = new();
+    public ObservableCollection<OrderItem> RecentTicketItems { get; } = new();
 
     public MainWindow(
         AuthService authService,
@@ -90,6 +92,8 @@ public partial class MainWindow : Window
         ReportCategorySalesList.ItemsSource = ReportCategorySales;
         ReportTopItemsList.ItemsSource = ReportTopItems;
         ReportHourlySalesList.ItemsSource = ReportHourlySales;
+        RecentOrdersList.ItemsSource = RecentOrders;
+        RecentTicketItemsList.ItemsSource = RecentTicketItems;
 
         PaymentMethodCombo.ItemsSource = Enum.GetValues(typeof(PaymentMethod));
         PaymentMethodCombo.SelectedItem = PaymentMethod.Cash;
@@ -179,6 +183,7 @@ public partial class MainWindow : Window
         PaymentPanel.Visibility = Visibility.Collapsed;
         ReceiptPanel.Visibility = Visibility.Collapsed;
         ReportPanel.Visibility = Visibility.Collapsed;
+        RecentOrdersPanel.Visibility = Visibility.Collapsed;
         AdminPanel.Visibility = Visibility.Collapsed;
         PinBox.Password = string.Empty;
         LoginStatusText.Text = string.Empty;
@@ -192,6 +197,7 @@ public partial class MainWindow : Window
         PaymentPanel.Visibility = Visibility.Collapsed;
         ReceiptPanel.Visibility = Visibility.Collapsed;
         ReportPanel.Visibility = Visibility.Collapsed;
+        RecentOrdersPanel.Visibility = Visibility.Collapsed;
         AdminPanel.Visibility = Visibility.Collapsed;
     }
 
@@ -202,6 +208,7 @@ public partial class MainWindow : Window
         PaymentPanel.Visibility = Visibility.Visible;
         ReceiptPanel.Visibility = Visibility.Collapsed;
         ReportPanel.Visibility = Visibility.Collapsed;
+        RecentOrdersPanel.Visibility = Visibility.Collapsed;
         AdminPanel.Visibility = Visibility.Collapsed;
     }
 
@@ -212,6 +219,7 @@ public partial class MainWindow : Window
         PaymentPanel.Visibility = Visibility.Collapsed;
         ReceiptPanel.Visibility = Visibility.Visible;
         ReportPanel.Visibility = Visibility.Collapsed;
+        RecentOrdersPanel.Visibility = Visibility.Collapsed;
         AdminPanel.Visibility = Visibility.Collapsed;
     }
 
@@ -222,6 +230,18 @@ public partial class MainWindow : Window
         PaymentPanel.Visibility = Visibility.Collapsed;
         ReceiptPanel.Visibility = Visibility.Collapsed;
         ReportPanel.Visibility = Visibility.Visible;
+        RecentOrdersPanel.Visibility = Visibility.Collapsed;
+        AdminPanel.Visibility = Visibility.Collapsed;
+    }
+
+    private void ShowRecentOrders()
+    {
+        LoginPanel.Visibility = Visibility.Collapsed;
+        OrderPanel.Visibility = Visibility.Collapsed;
+        PaymentPanel.Visibility = Visibility.Collapsed;
+        ReceiptPanel.Visibility = Visibility.Collapsed;
+        ReportPanel.Visibility = Visibility.Collapsed;
+        RecentOrdersPanel.Visibility = Visibility.Visible;
         AdminPanel.Visibility = Visibility.Collapsed;
     }
 
@@ -232,6 +252,7 @@ public partial class MainWindow : Window
         PaymentPanel.Visibility = Visibility.Collapsed;
         ReceiptPanel.Visibility = Visibility.Collapsed;
         ReportPanel.Visibility = Visibility.Collapsed;
+        RecentOrdersPanel.Visibility = Visibility.Collapsed;
         AdminPanel.Visibility = Visibility.Visible;
     }
 
@@ -372,17 +393,20 @@ public partial class MainWindow : Window
 
     private void CloseReportDatePickerIfOutside(object originalSource)
     {
-        if (ReportDatePicker is null || !ReportDatePicker.IsDropDownOpen)
-        {
-            return;
-        }
-
         if (originalSource is not DependencyObject source || IsWithinDatePickerOrCalendar(source))
         {
             return;
         }
 
-        ReportDatePicker.IsDropDownOpen = false;
+        if (ReportDatePicker is not null && ReportDatePicker.IsDropDownOpen)
+        {
+            ReportDatePicker.IsDropDownOpen = false;
+        }
+
+        if (RecentOrdersDatePicker is not null && RecentOrdersDatePicker.IsDropDownOpen)
+        {
+            RecentOrdersDatePicker.IsDropDownOpen = false;
+        }
     }
 
     private static bool IsWithinDatePickerOrCalendar(DependencyObject source)
@@ -633,6 +657,23 @@ public partial class MainWindow : Window
         ShowReports();
     }
 
+    private async void RecentOrdersButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (_currentUser is null)
+        {
+            ShowLogin();
+            return;
+        }
+
+        if (RecentOrdersDatePicker.SelectedDate is null)
+        {
+            RecentOrdersDatePicker.SelectedDate = DateTime.Today;
+        }
+
+        await RefreshRecentOrdersAsync();
+        ShowRecentOrders();
+    }
+
     private async void ReportDatePicker_OnSelectedDateChanged(object sender, SelectionChangedEventArgs e)
     {
         if (ReportPanel.Visibility != Visibility.Visible)
@@ -641,6 +682,16 @@ public partial class MainWindow : Window
         }
 
         await RefreshReportAsync();
+    }
+
+    private async void RecentOrdersDatePicker_OnSelectedDateChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (RecentOrdersPanel.Visibility != Visibility.Visible)
+        {
+            return;
+        }
+
+        await RefreshRecentOrdersAsync();
     }
 
     private async void AdminButton_OnClick(object sender, RoutedEventArgs e)
@@ -1287,6 +1338,70 @@ public partial class MainWindow : Window
         }
     }
 
+    private async Task RefreshRecentOrdersAsync()
+    {
+        var date = RecentOrdersDatePicker.SelectedDate?.Date;
+        var rows = await _orderService.GetRecentOrdersAsync(date);
+        RecentOrders.Clear();
+        foreach (var row in rows)
+        {
+            RecentOrders.Add(row);
+        }
+
+        var first = RecentOrders.FirstOrDefault();
+        if (first is not null)
+        {
+            RecentOrdersList.SelectedItem = first;
+        }
+        else
+        {
+            ClearRecentTicketDetails();
+        }
+    }
+
+    private async void RecentOrdersList_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        var selected = RecentOrdersList.SelectedItem as RecentOrderRow;
+        if (selected is null)
+        {
+            ClearRecentTicketDetails();
+            return;
+        }
+
+        var order = await _orderService.GetOrderAsync(selected.OrderId);
+        if (order is null)
+        {
+            ClearRecentTicketDetails();
+            return;
+        }
+
+        UpdateRecentTicketDetails(order);
+    }
+
+    private void UpdateRecentTicketDetails(Order order)
+    {
+        RecentTicketItems.Clear();
+        foreach (var item in order.Items)
+        {
+            RecentTicketItems.Add(item);
+        }
+
+        var customer = string.IsNullOrWhiteSpace(order.CustomerName) ? "-" : order.CustomerName;
+        RecentTicketHeaderText.Text = $"Order #{order.OrderNumber} · {customer}";
+        RecentTicketSubtotalText.Text = FormatCents(order.SubtotalCents);
+        RecentTicketTaxText.Text = FormatCents(order.TaxCents);
+        RecentTicketTotalText.Text = FormatCents(order.TotalCents);
+    }
+
+    private void ClearRecentTicketDetails()
+    {
+        RecentTicketItems.Clear();
+        RecentTicketHeaderText.Text = "-";
+        RecentTicketSubtotalText.Text = "-";
+        RecentTicketTaxText.Text = "-";
+        RecentTicketTotalText.Text = "-";
+    }
+
     private async Task RefreshAdminDataAsync()
     {
         CategoryStatusText.Text = string.Empty;
@@ -1470,13 +1585,14 @@ public partial class MainWindow : Window
 
     private void UpdateRoleButtons(UserRole? role)
     {
-        if (ReportsButton is null || AdminButton is null)
+        if (ReportsButton is null || AdminButton is null || RecentOrdersButton is null)
         {
             return;
         }
 
         var canView = role is UserRole.Admin or UserRole.Manager;
         ReportsButton.Visibility = canView ? Visibility.Visible : Visibility.Collapsed;
+        RecentOrdersButton.Visibility = canView ? Visibility.Visible : Visibility.Collapsed;
         AdminButton.Visibility = canView ? Visibility.Visible : Visibility.Collapsed;
     }
 

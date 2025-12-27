@@ -247,6 +247,35 @@ public class OrderService
         return order;
     }
 
+    public async Task<List<RecentOrderRow>> GetRecentOrdersAsync(DateTime? dateLocal = null)
+    {
+        var localDay = (dateLocal ?? DateTime.Now).Date;
+        var localStart = localDay;
+        var localEnd = localStart.AddDays(1);
+
+        var utcStart = TimeZoneInfo.ConvertTimeToUtc(localStart, TimeZoneInfo.Local);
+        var utcEnd = TimeZoneInfo.ConvertTimeToUtc(localEnd, TimeZoneInfo.Local);
+
+        var orders = await _db.Orders
+            .AsNoTracking()
+            .Where(o => o.CreatedAt >= utcStart && o.CreatedAt < utcEnd)
+            .OrderByDescending(o => o.CreatedAt)
+            .ToListAsync();
+
+        return orders.Select(o => new RecentOrderRow
+            {
+                OrderId = o.Id,
+                OrderNumber = o.OrderNumber,
+                Status = o.Status.ToString(),
+                CustomerName = string.IsNullOrWhiteSpace(o.CustomerName) ? "-" : o.CustomerName,
+                TotalCents = o.TotalCents,
+                CreatedAt = o.CreatedAt,
+                TotalDisplay = FormatCents(o.TotalCents),
+                CreatedAtDisplay = o.CreatedAt.ToLocalTime().ToString("g")
+            })
+            .ToList();
+    }
+
     private async Task RecalculateTotalsAsync(Order order)
     {
         var menuItemIds = order.Items.Select(i => i.MenuItemId).Distinct().ToList();
@@ -284,6 +313,11 @@ public class OrderService
         item.Notes = string.Join(", ", item.Customizations.Select(c => c.NameSnapshot));
     }
 
+    private static string FormatCents(int cents)
+    {
+        return string.Format("${0:0.00}", cents / 100.0);
+    }
+
     private async Task SaveChangesWithRetryAsync()
     {
         try
@@ -307,4 +341,16 @@ public class OrderService
             await _db.SaveChangesAsync();
         }
     }
+}
+
+public class RecentOrderRow
+{
+    public Guid OrderId { get; set; }
+    public int OrderNumber { get; set; }
+    public string Status { get; set; } = "";
+    public string CustomerName { get; set; } = "";
+    public int TotalCents { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public string TotalDisplay { get; set; } = "";
+    public string CreatedAtDisplay { get; set; } = "";
 }

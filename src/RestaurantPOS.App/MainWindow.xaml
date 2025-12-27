@@ -48,13 +48,16 @@
             <StackPanel Grid.Row="0" Grid.ColumnSpan="2" Margin="0,0,0,10">
                 <Border Margin="-12,0,-12,8" BorderBrush="#D0D0D0" BorderThickness="1">
                     <DockPanel LastChildFill="False">
-                        <Menu DockPanel.Dock="Left">
-                            <MenuItem Header="Menu">
-                                <MenuItem Header="Reports" x:Name="ReportsButton" Click="ReportsButton_OnClick" />
-                                <MenuItem Header="Admin" x:Name="AdminButton" Click="AdminButton_OnClick" />
-                                <MenuItem Header="Logout" Click="LogoutButton_OnClick" />
-                            </MenuItem>
-                        </Menu>
+                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                            <Menu>
+                                <MenuItem Header="Menu">
+                                    <MenuItem Header="Reports" x:Name="ReportsButton" Click="ReportsButton_OnClick" />
+                                    <MenuItem Header="Admin" x:Name="AdminButton" Click="AdminButton_OnClick" />
+                                    <MenuItem Header="Logout" Click="LogoutButton_OnClick" />
+                                </MenuItem>
+                            </Menu>
+                            <Button x:Name="RecentOrdersButton" Content="Recent Orders" Margin="8,0,0,0" Height="36" Click="RecentOrdersButton_OnClick" />
+                        </StackPanel>
                         <TextBlock x:Name="LoggedInText" VerticalAlignment="Center" DockPanel.Dock="Right" Margin="0,0,12,0" />
                     </DockPanel>
                 </Border>
@@ -518,6 +521,108 @@
                     </ScrollViewer>
                 </Grid>
             </Border>
+
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+                <Button Content="Back" Width="110" Click="BackToOrderButton_OnClick" />
+            </StackPanel>
+        </Grid>
+
+        <Grid x:Name="RecentOrdersPanel" Visibility="Collapsed">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <DockPanel LastChildFill="False">
+                <TextBlock Text="Recent Orders" FontSize="22" FontWeight="Bold" DockPanel.Dock="Left" />
+                <DatePicker x:Name="RecentOrdersDatePicker" DockPanel.Dock="Right" SelectedDateChanged="RecentOrdersDatePicker_OnSelectedDateChanged" />
+            </DockPanel>
+
+            <Grid Grid.Row="1" Margin="0,16,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="3*" />
+                    <ColumnDefinition Width="2*" />
+                </Grid.ColumnDefinitions>
+                <Border Grid.Column="0" BorderBrush="#D0D0D0" BorderThickness="1" Padding="8" Margin="0,0,12,0">
+                    <ListView x:Name="RecentOrdersList" BorderBrush="#D0D0D0" BorderThickness="1" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Disabled" SelectionChanged="RecentOrdersList_OnSelectionChanged">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="Order" DisplayMemberBinding="{Binding OrderNumber}" Width="70" />
+                                <GridViewColumn Header="Status" DisplayMemberBinding="{Binding Status}" Width="90" />
+                                <GridViewColumn Header="Customer" DisplayMemberBinding="{Binding CustomerName}" Width="170" />
+                                <GridViewColumn Header="Total" DisplayMemberBinding="{Binding TotalDisplay}" Width="90" />
+                                <GridViewColumn Header="Created" DisplayMemberBinding="{Binding CreatedAtDisplay}" Width="150" />
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </Border>
+                <Border Grid.Column="1" BorderBrush="#D0D0D0" BorderThickness="1" Padding="8">
+                    <StackPanel>
+                        <TextBlock Text="Ticket" FontWeight="SemiBold" />
+                        <TextBlock x:Name="RecentTicketHeaderText" Margin="0,6,0,0" />
+                        <Grid Margin="0,10,0,0" Grid.IsSharedSizeScope="True">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0" Margin="0,0,0,4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" SharedSizeGroup="RecentItem" />
+                                    <ColumnDefinition Width="60" SharedSizeGroup="RecentQty" />
+                                    <ColumnDefinition Width="90" SharedSizeGroup="RecentPrice" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Item" FontWeight="Bold" />
+                                <TextBlock Grid.Column="1" Text="Qty" FontWeight="Bold" TextAlignment="Right" />
+                                <TextBlock Grid.Column="2" Text="Price" FontWeight="Bold" TextAlignment="Right" />
+                            </Grid>
+                            <ListBox x:Name="RecentTicketItemsList" Grid.Row="1">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="4">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+                                            <Grid Grid.Row="0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" SharedSizeGroup="RecentItem" />
+                                                    <ColumnDefinition Width="60" SharedSizeGroup="RecentQty" />
+                                                    <ColumnDefinition Width="90" SharedSizeGroup="RecentPrice" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="{Binding NameSnapshot}" />
+                                                <TextBlock Grid.Column="1" Text="{Binding Qty}" TextAlignment="Right" />
+                                                <TextBlock Grid.Column="2" Text="{Binding LineTotalCents}" TextAlignment="Right" />
+                                            </Grid>
+                                            <ItemsControl Grid.Row="1" ItemsSource="{Binding Customizations}" Margin="0,2,0,0">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Margin="0,2,0,0" FontSize="11" Foreground="#666666">
+                                                            <TextBlock.Text>
+                                                                <MultiBinding Converter="{StaticResource CustomizationDisplayConverter}">
+                                                                    <Binding Path="NameSnapshot" />
+                                                                    <Binding Path="PriceCents" />
+                                                                </MultiBinding>
+                                                            </TextBlock.Text>
+                                                        </TextBlock>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </Grid>
+                        <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                            <TextBlock Text="Subtotal:" FontWeight="SemiBold" />
+                            <TextBlock x:Name="RecentTicketSubtotalText" Margin="6,0,16,0" />
+                            <TextBlock Text="Tax:" FontWeight="SemiBold" />
+                            <TextBlock x:Name="RecentTicketTaxText" Margin="6,0,16,0" />
+                            <TextBlock Text="Total:" FontWeight="SemiBold" />
+                            <TextBlock x:Name="RecentTicketTotalText" Margin="6,0,0,0" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </Grid>
 
             <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
                 <Button Content="Back" Width="110" Click="BackToOrderButton_OnClick" />
