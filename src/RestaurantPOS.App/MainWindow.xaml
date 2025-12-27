@@ -58,14 +58,16 @@
                             </Menu>
                             <Button x:Name="RecentOrdersButton" Content="Recent Orders" Margin="8,0,0,0" Height="36" Click="RecentOrdersButton_OnClick" />
                         </StackPanel>
-                        <TextBlock x:Name="LoggedInText" VerticalAlignment="Center" DockPanel.Dock="Right" Margin="0,0,12,0" />
+                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center" Margin="0,0,12,0">
+                            <TextBlock x:Name="LoggedInText" VerticalAlignment="Center" Margin="0,0,12,0" />
+                            <TextBlock Text="Customer Order #" FontWeight="SemiBold" Margin="0,0,6,0" />
+                            <TextBlock x:Name="OrderNumberText" FontWeight="SemiBold" />
+                        </StackPanel>
                     </DockPanel>
                 </Border>
                 <DockPanel LastChildFill="False">
-                    <TextBlock Text="Order" FontSize="22" FontWeight="Bold" DockPanel.Dock="Left" Margin="0,0,16,0" />
+                    <TextBlock Text="Customer Order" FontSize="22" FontWeight="Bold" DockPanel.Dock="Left" Margin="0,0,16,0" />
                     <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
-                        <TextBlock Text="Order #" FontWeight="SemiBold" Margin="0,0,6,0" />
-                        <TextBlock x:Name="OrderNumberText" FontWeight="SemiBold" Margin="0,0,12,0" />
                         <TextBlock Text="Customer Name" FontWeight="SemiBold" Margin="0,0,6,0" />
                         <TextBox x:Name="CustomerNameBox" Width="200" Margin="0,0,6,0" LostFocus="CustomerNameBox_OnLostFocus" />
                     </StackPanel>
@@ -135,6 +137,7 @@
                         <RowDefinition Height="*" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <TextBlock Text="Ticket" FontWeight="SemiBold" />
                     <Grid Grid.Row="1" Grid.IsSharedSizeScope="True">
@@ -189,7 +192,8 @@
                             </ListBox.ItemTemplate>
                         </ListBox>
                     </Grid>
-                    <Grid Grid.Row="2" Margin="0,8,0,0">
+                    <Button Grid.Row="2" Content="Remove Item" Margin="0,8,0,0" Height="32" Click="RemoveItemButton_OnClick" />
+                    <Grid Grid.Row="3" Margin="0,8,0,0">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
@@ -240,7 +244,7 @@
                         </Grid>
                         <TextBlock x:Name="CustomizationStatusText" Grid.Row="2" Margin="0,6,0,0" Foreground="DarkRed" TextWrapping="Wrap" />
                     </Grid>
-                    <Button Grid.Row="3" Content="Remove Item" Margin="0,8,0,0" Height="32" Click="RemoveItemButton_OnClick" />
+                    <Button Grid.Row="4" Content="Cancel Order" Margin="0,8,0,0" Height="32" Click="CancelOrderButton_OnClick" />
                 </Grid>
             </Grid>
 

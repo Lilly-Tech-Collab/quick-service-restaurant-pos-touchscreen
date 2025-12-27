@@ -273,7 +273,7 @@ public partial class MainWindow : Window
         }
 
         _currentUser = user;
-        LoggedInText.Text = $"User: {user.DisplayName} ({user.Role})";
+        LoggedInText.Text = $"Logged in user: {user.DisplayName} ({user.Role})";
         UpdateRoleButtons(user.Role);
         _currentOrder = await _orderService.CreateOrderAsync(user);
         UpdateOrderHeader(_currentOrder);
@@ -602,6 +602,25 @@ public partial class MainWindow : Window
 
         PaymentTotalText.Text = FormatCents(_currentOrder.TotalCents);
         ShowPayment();
+    }
+
+    private async void CancelOrderButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (_currentUser is null)
+        {
+            ShowLogin();
+            return;
+        }
+
+        if (_currentOrder is not null)
+        {
+            await _orderService.CancelOrderAsync(_currentOrder.Id);
+        }
+
+        _currentOrder = await _orderService.CreateOrderAsync(_currentUser);
+        UpdateOrderHeader(_currentOrder);
+        await RefreshTicketAsync();
+        ShowOrder();
     }
 
     private void BackToOrderButton_OnClick(object sender, RoutedEventArgs e)

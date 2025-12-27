@@ -247,6 +247,19 @@ public class OrderService
         return order;
     }
 
+    public async Task<bool> CancelOrderAsync(Guid orderId)
+    {
+        var order = await _db.Orders.FirstOrDefaultAsync(o => o.Id == orderId);
+        if (order is null)
+        {
+            return false;
+        }
+
+        order.Status = OrderStatus.Cancelled;
+        await SaveChangesWithRetryAsync();
+        return true;
+    }
+
     public async Task<List<RecentOrderRow>> GetRecentOrdersAsync(DateTime? dateLocal = null)
     {
         var localDay = (dateLocal ?? DateTime.Now).Date;
