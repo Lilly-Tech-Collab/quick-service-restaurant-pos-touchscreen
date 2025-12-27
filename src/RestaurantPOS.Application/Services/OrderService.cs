@@ -8,15 +8,24 @@ namespace RestaurantPOS.Application.Services;
 public class OrderService
 {
     private readonly AppDbContext _db;
+    private readonly SettingsService _settingsService;
 
-    public OrderService(AppDbContext db)
+    public OrderService(AppDbContext db, SettingsService settingsService)
     {
         _db = db;
+        _settingsService = settingsService;
     }
 
     public async Task<Order> CreateOrderAsync(User user, OrderType orderType = OrderType.DineIn)
     {
-        var nextNumber = (await _db.Orders.MaxAsync(o => (int?)o.OrderNumber) ?? 0) + 1;
+        var resetMode = await _settingsService.GetOrderNumberResetModeAsync();
+        var nextNumber = resetMode switch
+        {
+            OrderNumberResetMode.Daily => await GetNextDailyOrderNumberAsync(0),
+            OrderNumberResetMode.BusinessDay => await GetNextDailyOrderNumberAsync(await _settingsService.GetBusinessDayStartHourAsync()),
+            OrderNumberResetMode.Daypart => await GetNextDaypartOrderNumberAsync(),
+            _ => await GetNextGlobalOrderNumberAsync()
+        };
 
         var order = new Order
         {
@@ -30,6 +39,76 @@ public class OrderService
         _db.Orders.Add(order);
         await SaveChangesWithRetryAsync();
         return order;
+    }
+
+    private async Task<int> GetNextDailyOrderNumberAsync(int startHour)
+    {
+        var localNow = DateTime.Now;
+        var localStart = localNow.Date.AddHours(startHour);
+        if (localNow < localStart)
+        {
+            localStart = localStart.AddDays(-1);
+        }
+
+        var localEnd = localStart.AddDays(1);
+
+        var utcStart = TimeZoneInfo.ConvertTimeToUtc(localStart, TimeZoneInfo.Local);
+        var utcEnd = TimeZoneInfo.ConvertTimeToUtc(localEnd, TimeZoneInfo.Local);
+
+        var maxNumber = await _db.Orders
+            .Where(o => o.CreatedAt >= utcStart && o.CreatedAt < utcEnd)
+            .MaxAsync(o => (int?)o.OrderNumber);
+
+        return (maxNumber ?? 0) + 1;
+    }
+
+    private async Task<int> GetNextDaypartOrderNumberAsync()
+    {
+        var (breakfast, lunch, dinner) = await _settingsService.GetDaypartStartHoursAsync();
+        var localNow = DateTime.Now;
+        var dayStart = localNow.Date;
+
+        var breakfastStart = dayStart.AddHours(breakfast);
+        var lunchStart = dayStart.AddHours(lunch);
+        var dinnerStart = dayStart.AddHours(dinner);
+
+        DateTime localStart;
+        DateTime localEnd;
+        if (localNow >= dinnerStart)
+        {
+            localStart = dinnerStart;
+            localEnd = dayStart.AddDays(1).AddHours(breakfast);
+        }
+        else if (localNow >= lunchStart)
+        {
+            localStart = lunchStart;
+            localEnd = dinnerStart;
+        }
+        else if (localNow >= breakfastStart)
+        {
+            localStart = breakfastStart;
+            localEnd = lunchStart;
+        }
+        else
+        {
+            localStart = dayStart.AddDays(-1).AddHours(dinner);
+            localEnd = breakfastStart;
+        }
+
+        var utcStart = TimeZoneInfo.ConvertTimeToUtc(localStart, TimeZoneInfo.Local);
+        var utcEnd = TimeZoneInfo.ConvertTimeToUtc(localEnd, TimeZoneInfo.Local);
+
+        var maxNumber = await _db.Orders
+            .Where(o => o.CreatedAt >= utcStart && o.CreatedAt < utcEnd)
+            .MaxAsync(o => (int?)o.OrderNumber);
+
+        return (maxNumber ?? 0) + 1;
+    }
+
+    private async Task<int> GetNextGlobalOrderNumberAsync()
+    {
+        var maxNumber = await _db.Orders.MaxAsync(o => (int?)o.OrderNumber);
+        return (maxNumber ?? 0) + 1;
     }
 
     public async Task<Order> AddItemAsync(Guid orderId, MenuItem menuItem)
@@ -152,6 +231,20 @@ public class OrderService
             .Include(o => o.Items)
             .ThenInclude(i => i.Customizations)
             .FirstOrDefaultAsync(o => o.Id == orderId);
+    }
+
+    public async Task<Order?> UpdateCustomerNameAsync(Guid orderId, string? customerName)
+    {
+        var order = await _db.Orders.FirstOrDefaultAsync(o => o.Id == orderId);
+        if (order is null)
+        {
+            return null;
+        }
+
+        var trimmed = string.IsNullOrWhiteSpace(customerName) ? null : customerName.Trim();
+        order.CustomerName = trimmed;
+        await SaveChangesWithRetryAsync();
+        return order;
     }
 
     private async Task RecalculateTotalsAsync(Order order)

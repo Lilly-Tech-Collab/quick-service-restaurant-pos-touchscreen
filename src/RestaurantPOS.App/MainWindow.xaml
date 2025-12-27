@@ -58,8 +58,14 @@
                         <TextBlock x:Name="LoggedInText" VerticalAlignment="Center" DockPanel.Dock="Right" Margin="0,0,12,0" />
                     </DockPanel>
                 </Border>
-                <DockPanel>
+                <DockPanel LastChildFill="False">
                     <TextBlock Text="Order" FontSize="22" FontWeight="Bold" DockPanel.Dock="Left" Margin="0,0,16,0" />
+                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
+                        <TextBlock Text="Order #" FontWeight="SemiBold" Margin="0,0,6,0" />
+                        <TextBlock x:Name="OrderNumberText" FontWeight="SemiBold" Margin="0,0,12,0" />
+                        <TextBlock Text="Customer Name" FontWeight="SemiBold" Margin="0,0,6,0" />
+                        <TextBox x:Name="CustomerNameBox" Width="200" Margin="0,0,6,0" LostFocus="CustomerNameBox_OnLostFocus" />
+                    </StackPanel>
                 </DockPanel>
             </StackPanel>
 
@@ -296,6 +302,10 @@
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
                             <TextBlock Text="Payment Method: " FontWeight="SemiBold" Width="140" />
                             <TextBlock x:Name="ReceiptPaymentMethodText" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                            <TextBlock Text="Customer: " FontWeight="SemiBold" Width="140" />
+                            <TextBlock x:Name="ReceiptCustomerNameText" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Total: " FontWeight="SemiBold" Width="140" />
@@ -546,6 +556,27 @@
                             <TextBox x:Name="RestaurantNameBox" Height="30" Margin="0,8,0,0" />
                             <Button Content="Save Name" Margin="0,12,0,0" Height="32" Click="SaveRestaurantNameButton_OnClick" />
                             <TextBlock x:Name="RestaurantNameStatusText" Margin="0,8,0,0" Foreground="DarkRed" TextWrapping="Wrap" />
+                            <TextBlock Text="Order Number Reset" FontWeight="SemiBold" Margin="0,20,0,0" />
+                            <ComboBox x:Name="OrderNumberResetCombo" Height="30" Margin="0,8,0,0" />
+                            <TextBlock Text="Business Day Start Hour" FontWeight="SemiBold" Margin="0,12,0,0" />
+                            <ComboBox x:Name="BusinessDayStartHourCombo" Height="30" Margin="0,8,0,0" />
+                            <TextBlock Text="Daypart Start Hours" FontWeight="SemiBold" Margin="0,12,0,0" />
+                            <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                <StackPanel Margin="0,0,12,0">
+                                    <TextBlock Text="Breakfast" FontSize="12" />
+                                    <ComboBox x:Name="DaypartBreakfastCombo" Width="90" Height="30" />
+                                </StackPanel>
+                                <StackPanel Margin="0,0,12,0">
+                                    <TextBlock Text="Lunch" FontSize="12" />
+                                    <ComboBox x:Name="DaypartLunchCombo" Width="90" Height="30" />
+                                </StackPanel>
+                                <StackPanel>
+                                    <TextBlock Text="Dinner" FontSize="12" />
+                                    <ComboBox x:Name="DaypartDinnerCombo" Width="90" Height="30" />
+                                </StackPanel>
+                            </StackPanel>
+                            <Button Content="Save Reset Option" Margin="0,12,0,0" Height="32" Click="SaveOrderNumberResetButton_OnClick" />
+                            <TextBlock x:Name="OrderNumberResetStatusText" Margin="0,8,0,0" Foreground="DarkRed" TextWrapping="Wrap" />
                         </StackPanel>
                     </Grid>
                 </TabItem>

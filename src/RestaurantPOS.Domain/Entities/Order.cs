@@ -11,6 +11,7 @@ public class Order
     public Guid CreatedByUserId { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public string? Notes { get; set; }
+    public string? CustomerName { get; set; }
     public int SubtotalCents { get; set; }
     public int TaxCents { get; set; }
     public int DiscountCents { get; set; }

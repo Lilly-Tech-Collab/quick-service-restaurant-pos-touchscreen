@@ -37,6 +37,7 @@ public partial class MainWindow : Window
     private MenuItemEntity? _selectedAdminMenuItem;
     private CustomizationItem? _selectedAdminCustomization;
     private User? _selectedAdminUser;
+    private bool _isUpdatingCustomerName;
 
     public ObservableCollection<MenuCategory> Categories { get; } = new();
     public ObservableCollection<MenuItemEntity> MenuItems { get; } = new();
@@ -96,6 +97,15 @@ public partial class MainWindow : Window
         UserRoleCombo.ItemsSource = Enum.GetValues(typeof(UserRole));
         UserRoleCombo.SelectedItem = UserRole.Cashier;
 
+        OrderNumberResetCombo.ItemsSource = Enum.GetValues(typeof(OrderNumberResetMode));
+        OrderNumberResetCombo.SelectedItem = OrderNumberResetMode.Daily;
+
+        var hours = Enumerable.Range(0, 24).ToList();
+        BusinessDayStartHourCombo.ItemsSource = hours;
+        DaypartBreakfastCombo.ItemsSource = hours;
+        DaypartLunchCombo.ItemsSource = hours;
+        DaypartDinnerCombo.ItemsSource = hours;
+
         AddHandler(UIElement.GotKeyboardFocusEvent, new KeyboardFocusChangedEventHandler(MainWindow_OnKeyboardFocus), true);
         AddHandler(UIElement.PreviewMouseDownEvent, new MouseButtonEventHandler(MainWindow_OnPreviewPointerDown), true);
         AddHandler(UIElement.PreviewTouchDownEvent, new EventHandler<TouchEventArgs>(MainWindow_OnPreviewTouchDown), true);
@@ -104,6 +114,7 @@ public partial class MainWindow : Window
     private async void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
     {
         await LoadRestaurantNameAsync();
+        await LoadOrderNumberResetModeAsync();
         await LoadMenuAsync();
         await LoadCustomizationsAsync();
         ShowLogin();
@@ -244,6 +255,7 @@ public partial class MainWindow : Window
         LoggedInText.Text = $"User: {user.DisplayName} ({user.Role})";
         UpdateRoleButtons(user.Role);
         _currentOrder = await _orderService.CreateOrderAsync(user);
+        UpdateOrderHeader(_currentOrder);
         await RefreshTicketAsync();
         ShowOrder();
     }
@@ -257,6 +269,8 @@ public partial class MainWindow : Window
         TicketItems.Clear();
         SelectedOrderCustomizations.Clear();
         CustomizationStatusText.Text = string.Empty;
+        CustomerNameBox.Text = string.Empty;
+        OrderNumberText.Text = "-";
         UpdateTotalsDisplay(null);
         UpdatePayButtonState(null);
         UpdateRoleButtons(null);
@@ -597,6 +611,7 @@ public partial class MainWindow : Window
         }
 
         _currentOrder = await _orderService.CreateOrderAsync(_currentUser);
+        UpdateOrderHeader(_currentOrder);
         await RefreshTicketAsync();
         ShowOrder();
     }
@@ -653,6 +668,23 @@ public partial class MainWindow : Window
         RestaurantNameStatusText.Text = "Saved.";
         await LoadRestaurantNameAsync();
         await RefreshAdminDataAsync();
+    }
+
+    private async void SaveOrderNumberResetButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (OrderNumberResetCombo.SelectedItem is not OrderNumberResetMode mode)
+        {
+            OrderNumberResetStatusText.Text = "Select a reset option.";
+            return;
+        }
+
+        await _settingsService.SetOrderNumberResetModeAsync(mode);
+        await _settingsService.SetBusinessDayStartHourAsync(GetComboHour(BusinessDayStartHourCombo, 0));
+        await _settingsService.SetDaypartStartHoursAsync(
+            GetComboHour(DaypartBreakfastCombo, 6),
+            GetComboHour(DaypartLunchCombo, 11),
+            GetComboHour(DaypartDinnerCombo, 16));
+        OrderNumberResetStatusText.Text = "Saved.";
     }
 
     private async void AddCategoryButton_OnClick(object sender, RoutedEventArgs e)
@@ -1066,6 +1098,7 @@ public partial class MainWindow : Window
             TicketItems.Clear();
             UpdateTotalsDisplay(null);
             UpdateSelectedOrderCustomizations(null);
+            UpdateOrderHeader(null);
             return;
         }
 
@@ -1075,9 +1108,11 @@ public partial class MainWindow : Window
             TicketItems.Clear();
             UpdateTotalsDisplay(null);
             UpdateSelectedOrderCustomizations(null);
+            UpdateOrderHeader(null);
             return;
         }
 
+        UpdateOrderHeader(order);
         UpdateTicketFromOrder(order);
     }
 
@@ -1096,6 +1131,27 @@ public partial class MainWindow : Window
         TaxText.Text = FormatCents(order.TaxCents);
         TotalText.Text = FormatCents(order.TotalCents);
         PaymentTotalText.Text = FormatCents(order.TotalCents);
+    }
+
+    private void UpdateOrderHeader(Order? order)
+    {
+        if (OrderNumberText is null || CustomerNameBox is null)
+        {
+            return;
+        }
+
+        _isUpdatingCustomerName = true;
+        if (order is null)
+        {
+            OrderNumberText.Text = "-";
+            CustomerNameBox.Text = string.Empty;
+            _isUpdatingCustomerName = false;
+            return;
+        }
+
+        OrderNumberText.Text = order.OrderNumber.ToString();
+        CustomerNameBox.Text = order.CustomerName ?? string.Empty;
+        _isUpdatingCustomerName = false;
     }
 
     private void UpdateTicketFromOrder(Order? order)
@@ -1158,7 +1214,30 @@ public partial class MainWindow : Window
         ReceiptOrderNumberText.Text = order.OrderNumber.ToString();
         ReceiptUserText.Text = _currentUser is null ? "-" : _currentUser.DisplayName;
         ReceiptPaymentMethodText.Text = method.ToString();
+        ReceiptCustomerNameText.Text = string.IsNullOrWhiteSpace(order.CustomerName) ? "-" : order.CustomerName;
         ReceiptTotalText.Text = FormatCents(order.TotalCents);
+    }
+
+    private async void CustomerNameBox_OnLostFocus(object sender, RoutedEventArgs e)
+    {
+        if (_currentOrder is null)
+        {
+            return;
+        }
+
+        if (_isUpdatingCustomerName)
+        {
+            return;
+        }
+
+        var name = CustomerNameBox.Text.Trim();
+        var updated = await _orderService.UpdateCustomerNameAsync(_currentOrder.Id, name);
+        if (updated is null)
+        {
+            return;
+        }
+
+        _currentOrder.CustomerName = updated.CustomerName;
     }
 
     private async Task RefreshReportAsync()
@@ -1215,6 +1294,7 @@ public partial class MainWindow : Window
         CustomizationAdminStatusText.Text = string.Empty;
         UserStatusText.Text = string.Empty;
         RestaurantNameStatusText.Text = string.Empty;
+        OrderNumberResetStatusText.Text = string.Empty;
 
         var selectedCategoryId = (AdminCategoriesList.SelectedItem as MenuCategory)?.Id;
         var selectedMenuItemId = (AdminMenuItemsList.SelectedItem as MenuItemEntity)?.Id;
@@ -1274,6 +1354,8 @@ public partial class MainWindow : Window
         {
             AdminUsersList.SelectedItem = AdminUsers.FirstOrDefault(u => u.Id == selectedUserId.Value);
         }
+
+        await LoadOrderNumberResetModeAsync();
     }
 
     private void AdminCategoriesList_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -1363,6 +1445,22 @@ public partial class MainWindow : Window
         AdminRestaurantNameText.Text = name;
         RestaurantNameBox.Text = name;
         Title = name;
+    }
+
+    private async Task LoadOrderNumberResetModeAsync()
+    {
+        var mode = await _settingsService.GetOrderNumberResetModeAsync();
+        OrderNumberResetCombo.SelectedItem = mode;
+        BusinessDayStartHourCombo.SelectedItem = await _settingsService.GetBusinessDayStartHourAsync();
+        var (breakfast, lunch, dinner) = await _settingsService.GetDaypartStartHoursAsync();
+        DaypartBreakfastCombo.SelectedItem = breakfast;
+        DaypartLunchCombo.SelectedItem = lunch;
+        DaypartDinnerCombo.SelectedItem = dinner;
+    }
+
+    private static int GetComboHour(ComboBox combo, int fallback)
+    {
+        return combo.SelectedItem is int hour ? hour : fallback;
     }
 
     private static string FormatCents(int cents)

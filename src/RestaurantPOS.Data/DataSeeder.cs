@@ -8,7 +8,17 @@ namespace RestaurantPOS.Data;
 public static class DataSeeder
 {
     private const string SettingRestaurantNameKey = "RestaurantName";
+    private const string SettingOrderNumberResetKey = "OrderNumberResetMode";
+    private const string SettingBusinessDayStartHourKey = "BusinessDayStartHour";
+    private const string SettingDaypartBreakfastStartHourKey = "DaypartBreakfastStartHour";
+    private const string SettingDaypartLunchStartHourKey = "DaypartLunchStartHour";
+    private const string SettingDaypartDinnerStartHourKey = "DaypartDinnerStartHour";
     private static readonly Guid RestaurantNameSettingId = Guid.Parse("55d918c9-4f86-4cf4-9166-b6d4c9a7c1fb");
+    private static readonly Guid OrderNumberResetSettingId = Guid.Parse("0b5c308e-9429-4db3-9a1b-0a2d5e6a0f39");
+    private static readonly Guid BusinessDayStartHourSettingId = Guid.Parse("79b1fb3d-7b88-4f69-b6aa-636a4f60da46");
+    private static readonly Guid DaypartBreakfastStartHourSettingId = Guid.Parse("3e2803f4-2b1f-49be-9c85-79c98c00c010");
+    private static readonly Guid DaypartLunchStartHourSettingId = Guid.Parse("45e88ef3-7fb2-4a62-88f9-e4c2475ba499");
+    private static readonly Guid DaypartDinnerStartHourSettingId = Guid.Parse("5c0b5501-1b20-4ef9-84a5-2f9c8746d0d9");
     private static readonly Guid CategoryBurgersId = Guid.Parse("5b2b9638-b8b9-4b62-8c31-39aefbcb8c50");
     private static readonly Guid CategorySidesId = Guid.Parse("5d6f9a8a-dfa0-4a1e-8844-0d9d41a76169");
     private static readonly Guid CategoryDrinksId = Guid.Parse("f566ceab-7a9a-4fd3-a7b7-9dd3b9e4f90e");
@@ -47,6 +57,36 @@ public static class DataSeeder
             Id = RestaurantNameSettingId,
             Key = SettingRestaurantNameKey,
             Value = "Restaurant POS"
+        },
+        new()
+        {
+            Id = OrderNumberResetSettingId,
+            Key = SettingOrderNumberResetKey,
+            Value = "Daily"
+        },
+        new()
+        {
+            Id = BusinessDayStartHourSettingId,
+            Key = SettingBusinessDayStartHourKey,
+            Value = "0"
+        },
+        new()
+        {
+            Id = DaypartBreakfastStartHourSettingId,
+            Key = SettingDaypartBreakfastStartHourKey,
+            Value = "6"
+        },
+        new()
+        {
+            Id = DaypartLunchStartHourSettingId,
+            Key = SettingDaypartLunchStartHourKey,
+            Value = "11"
+        },
+        new()
+        {
+            Id = DaypartDinnerStartHourSettingId,
+            Key = SettingDaypartDinnerStartHourKey,
+            Value = "16"
         }
     };
 

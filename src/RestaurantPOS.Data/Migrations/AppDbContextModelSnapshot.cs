@@ -46,6 +46,36 @@ namespace RestaurantPOS.Data.Migrations
                             Id = new Guid("55d918c9-4f86-4cf4-9166-b6d4c9a7c1fb"),
                             Key = "RestaurantName",
                             Value = "Restaurant POS"
+                        },
+                        new
+                        {
+                            Id = new Guid("0b5c308e-9429-4db3-9a1b-0a2d5e6a0f39"),
+                            Key = "OrderNumberResetMode",
+                            Value = "Daily"
+                        },
+                        new
+                        {
+                            Id = new Guid("79b1fb3d-7b88-4f69-b6aa-636a4f60da46"),
+                            Key = "BusinessDayStartHour",
+                            Value = "0"
+                        },
+                        new
+                        {
+                            Id = new Guid("3e2803f4-2b1f-49be-9c85-79c98c00c010"),
+                            Key = "DaypartBreakfastStartHour",
+                            Value = "6"
+                        },
+                        new
+                        {
+                            Id = new Guid("45e88ef3-7fb2-4a62-88f9-e4c2475ba499"),
+                            Key = "DaypartLunchStartHour",
+                            Value = "11"
+                        },
+                        new
+                        {
+                            Id = new Guid("5c0b5501-1b20-4ef9-84a5-2f9c8746d0d9"),
+                            Key = "DaypartDinnerStartHour",
+                            Value = "16"
                         });
                 });
 
@@ -265,6 +295,10 @@ namespace RestaurantPOS.Data.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CustomerName")
+                        .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreatedAt")

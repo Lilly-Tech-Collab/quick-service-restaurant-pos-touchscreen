@@ -82,6 +82,7 @@ public class AppDbContext : DbContext
             e.Property(x => x.OrderType).HasConversion<string>().IsRequired();
             e.Property(x => x.Status).HasConversion<string>().IsRequired();
             e.Property(x => x.CreatedAt).IsRequired();
+            e.Property(x => x.CustomerName).HasMaxLength(200);
             e.Property(x => x.SubtotalCents).IsRequired();
             e.Property(x => x.TaxCents).IsRequired();
             e.Property(x => x.DiscountCents).IsRequired();
