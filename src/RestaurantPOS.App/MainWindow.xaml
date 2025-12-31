@@ -67,23 +67,27 @@
                                 <MenuItem Header="Menu">
                                     <MenuItem Header="Reports" x:Name="ReportsButton" Click="ReportsButton_OnClick" />
                                     <MenuItem Header="Admin" x:Name="AdminButton" Click="AdminButton_OnClick" />
-                                    <MenuItem Header="Logout" Click="LogoutButton_OnClick" />
                                 </MenuItem>
                             </Menu>
                             <Button x:Name="RecentOrdersButton" Content="Recent Orders" Margin="8,0,0,0" Height="36" Click="RecentOrdersButton_OnClick" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center" Margin="0,0,12,0">
+                            <Button Content="Logout" Margin="0,0,12,0" Height="36" Click="LogoutButton_OnClick" />
                             <TextBlock x:Name="LoggedInText" VerticalAlignment="Center" Margin="0,0,12,0" />
-                            <TextBlock Text="Customer Order #" FontWeight="SemiBold" Margin="0,0,6,0" />
-                            <TextBlock x:Name="OrderNumberText" FontWeight="SemiBold" />
                         </StackPanel>
                     </DockPanel>
                 </Border>
                 <DockPanel LastChildFill="False">
                     <TextBlock Text="Customer Order" FontSize="22" FontWeight="Bold" DockPanel.Dock="Left" Margin="0,0,16,0" />
-                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
-                        <TextBlock Text="Customer Name" FontWeight="SemiBold" Margin="0,0,6,0" />
-                        <TextBox x:Name="CustomerNameBox" Width="200" Margin="0,0,6,0" LostFocus="CustomerNameBox_OnLostFocus" />
+                    <StackPanel DockPanel.Dock="Right" Orientation="Vertical" HorizontalAlignment="Right">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,6">
+                            <TextBlock Text="Customer Order #" FontWeight="SemiBold" Margin="0,0,6,0" />
+                            <TextBlock x:Name="OrderNumberText" FontWeight="SemiBold" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                            <TextBlock Text="Customer Name" FontWeight="SemiBold" Margin="0,0,6,0" />
+                            <TextBox x:Name="CustomerNameBox" Width="200" Margin="0,0,6,0" LostFocus="CustomerNameBox_OnLostFocus" />
+                        </StackPanel>
                     </StackPanel>
                 </DockPanel>
             </StackPanel>
