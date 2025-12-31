@@ -390,6 +390,7 @@ public partial class MainWindow : Window
         Customizations.Clear();
         SelectedOrderCustomizations.Clear();
         CustomizationStatusText.Text = string.Empty;
+        DiscountStatusText.Text = string.Empty;
         CustomerNameBox.Text = string.Empty;
         OrderNumberText.Text = "-";
         UpdateTotalsDisplay(null);
@@ -702,8 +703,88 @@ public partial class MainWindow : Window
             return;
         }
 
-        PaymentTotalText.Text = FormatCents(_currentOrder.TotalCents);
+        UpdateTotalsDisplay(_currentOrder);
         ShowPayment();
+    }
+
+    private async void ApplyOrderDiscountButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (_currentOrder is null)
+        {
+            return;
+        }
+
+        var (discountCents, percent, error) = ParseDiscountInputs(OrderDiscountAmountBox, OrderDiscountPercentBox);
+        if (error is not null)
+        {
+            DiscountStatusText.Text = error;
+            return;
+        }
+
+        var updated = await _orderService.UpdateDiscountAsync(_currentOrder.Id, discountCents, percent);
+        if (updated is null)
+        {
+            DiscountStatusText.Text = "Unable to apply discount.";
+            return;
+        }
+
+        _currentOrder = updated;
+        DiscountStatusText.Text = "Discount applied.";
+        await RefreshTicketAsync();
+    }
+
+    private static (int? DiscountCents, decimal? Percent, string? Error) ParseDiscountInputs(TextBox amountBox, TextBox percentBox)
+    {
+        var amountText = amountBox.Text.Trim();
+        var percentText = percentBox.Text.Trim();
+
+        if (string.IsNullOrWhiteSpace(amountText) && string.IsNullOrWhiteSpace(percentText))
+        {
+            return (0, null, null);
+        }
+
+        if (!string.IsNullOrWhiteSpace(amountText) && !string.IsNullOrWhiteSpace(percentText))
+        {
+            return (null, null, "Enter discount as cents or percent, not both.");
+        }
+
+        if (!string.IsNullOrWhiteSpace(amountText))
+        {
+            if (!int.TryParse(amountText, out var cents) || cents < 0)
+            {
+                return (null, null, "Discount cents must be a non-negative integer.");
+            }
+
+            return (cents, null, null);
+        }
+
+        if (!decimal.TryParse(percentText, out var percent) || percent < 0 || percent > 100)
+        {
+            return (null, null, "Discount percent must be between 0 and 100.");
+        }
+
+        return (null, percent, null);
+    }
+
+    private async void ClearOrderDiscountButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (_currentOrder is null)
+        {
+            return;
+        }
+
+        OrderDiscountAmountBox.Text = string.Empty;
+        OrderDiscountPercentBox.Text = string.Empty;
+        var updated = await _orderService.UpdateDiscountAsync(_currentOrder.Id, 0, null);
+        if (updated is null)
+        {
+            DiscountStatusText.Text = "Unable to clear discount.";
+            return;
+        }
+
+        _currentOrder = updated;
+        DiscountStatusText.Text = "Discount cleared.";
+        await RefreshTicketAsync();
     }
 
     private async void CancelOrderButton_OnClick(object sender, RoutedEventArgs e)
@@ -1344,6 +1425,19 @@ public partial class MainWindow : Window
             TaxText.Text = "-";
             TotalText.Text = "-";
             PaymentTotalText.Text = "-";
+            DiscountText.Text = "-";
+            if (PaymentSubtotalText is not null)
+            {
+                PaymentSubtotalText.Text = "-";
+            }
+            if (PaymentTaxText is not null)
+            {
+                PaymentTaxText.Text = "-";
+            }
+            if (PaymentDiscountText is not null)
+            {
+                PaymentDiscountText.Text = "-";
+            }
             return;
         }
 
@@ -1351,6 +1445,19 @@ public partial class MainWindow : Window
         TaxText.Text = FormatCents(order.TaxCents);
         TotalText.Text = FormatCents(order.TotalCents);
         PaymentTotalText.Text = FormatCents(order.TotalCents);
+        DiscountText.Text = FormatCents(order.DiscountCents);
+        if (PaymentSubtotalText is not null)
+        {
+            PaymentSubtotalText.Text = FormatCents(order.SubtotalCents);
+        }
+        if (PaymentTaxText is not null)
+        {
+            PaymentTaxText.Text = FormatCents(order.TaxCents);
+        }
+        if (PaymentDiscountText is not null)
+        {
+            PaymentDiscountText.Text = FormatCents(order.DiscountCents);
+        }
     }
 
     private void UpdateOrderHeader(Order? order)
@@ -1435,6 +1542,9 @@ public partial class MainWindow : Window
         ReceiptUserText.Text = _currentUser is null ? "-" : _currentUser.DisplayName;
         ReceiptPaymentMethodText.Text = method.ToString();
         ReceiptCustomerNameText.Text = string.IsNullOrWhiteSpace(order.CustomerName) ? "-" : order.CustomerName;
+        ReceiptSubtotalText.Text = FormatCents(order.SubtotalCents);
+        ReceiptTaxText.Text = FormatCents(order.TaxCents);
+        ReceiptDiscountText.Text = FormatCents(order.DiscountCents);
         ReceiptTotalText.Text = FormatCents(order.TotalCents);
     }
 

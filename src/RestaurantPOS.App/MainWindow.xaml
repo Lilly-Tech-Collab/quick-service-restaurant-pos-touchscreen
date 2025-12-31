@@ -55,8 +55,8 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="3*" />
-                <ColumnDefinition Width="4*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="5*" />
             </Grid.ColumnDefinitions>
 
             <StackPanel Grid.Row="0" Grid.ColumnSpan="2" Margin="0,0,0,10">
@@ -267,13 +267,42 @@
             </Grid>
 
             <DockPanel Grid.Row="2" Grid.ColumnSpan="2" Margin="0,12,0,0">
-                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
-                    <TextBlock Text="Subtotal: " FontWeight="Bold" FontSize="16" />
-                    <TextBlock x:Name="SubtotalText" Margin="0,0,16,0" FontWeight="Bold" FontSize="16" />
-                    <TextBlock Text="Tax: " FontWeight="Bold" FontSize="16" />
-                    <TextBlock x:Name="TaxText" Margin="0,0,16,0" FontWeight="Bold" FontSize="16" />
-                    <TextBlock Text="Total: " FontWeight="Bold" FontSize="18" />
-                    <TextBlock x:Name="TotalText" FontWeight="Bold" FontSize="18" />
+                <StackPanel DockPanel.Dock="Left">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Subtotal: " FontWeight="Bold" FontSize="16" />
+                        <TextBlock x:Name="SubtotalText" Margin="0,0,16,0" FontWeight="Bold" FontSize="16" />
+                        <TextBlock Text="Tax: " FontWeight="Bold" FontSize="16" />
+                        <TextBlock x:Name="TaxText" Margin="0,0,16,0" FontWeight="Bold" FontSize="16" />
+                        <TextBlock Text="Discount: " FontWeight="Bold" FontSize="16" />
+                        <TextBlock x:Name="DiscountText" Margin="0,0,16,0" FontWeight="Bold" FontSize="16" />
+                        <TextBlock Text="Total: " FontWeight="Bold" FontSize="18" />
+                        <TextBlock x:Name="TotalText" FontWeight="Bold" FontSize="18" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                        <TextBlock Text="Discount (cents)" FontWeight="SemiBold" VerticalAlignment="Center" />
+                        <TextBox x:Name="OrderDiscountAmountBox" Width="90" Margin="6,0,12,0">
+                            <TextBox.InputScope>
+                                <InputScope>
+                                    <InputScope.Names>
+                                        <InputScopeName NameValue="Number" />
+                                    </InputScope.Names>
+                                </InputScope>
+                            </TextBox.InputScope>
+                        </TextBox>
+                        <TextBlock Text="Discount (%)" FontWeight="SemiBold" VerticalAlignment="Center" />
+                        <TextBox x:Name="OrderDiscountPercentBox" Width="70" Margin="6,0,12,0">
+                            <TextBox.InputScope>
+                                <InputScope>
+                                    <InputScope.Names>
+                                        <InputScopeName NameValue="Number" />
+                                    </InputScope.Names>
+                                </InputScope>
+                            </TextBox.InputScope>
+                        </TextBox>
+                        <Button Content="Apply Discount" Height="32" Click="ApplyOrderDiscountButton_OnClick" />
+                        <Button Content="Clear Discount" Margin="8,0,0,0" Height="32" Click="ClearOrderDiscountButton_OnClick" />
+                    </StackPanel>
+                    <TextBlock x:Name="DiscountStatusText" Margin="0,6,0,0" Foreground="DarkRed" TextWrapping="Wrap" />
                 </StackPanel>
                 <Button x:Name="PayButton" Content="Pay" Width="120" Height="36" DockPanel.Dock="Right" Click="PayButton_OnClick" />
             </DockPanel>
@@ -288,6 +317,12 @@
             <TextBlock Text="Payment" FontSize="22" FontWeight="Bold" />
 
             <StackPanel Grid.Row="1" Margin="0,16,0,0" Width="320">
+                <TextBlock Text="Subtotal" FontWeight="SemiBold" />
+                <TextBlock x:Name="PaymentSubtotalText" FontSize="20" FontWeight="Bold" Margin="0,6,0,8" />
+                <TextBlock Text="Tax" FontWeight="SemiBold" />
+                <TextBlock x:Name="PaymentTaxText" FontSize="20" FontWeight="Bold" Margin="0,6,0,8" />
+                <TextBlock Text="Discount" FontWeight="SemiBold" />
+                <TextBlock x:Name="PaymentDiscountText" FontSize="20" FontWeight="Bold" Margin="0,6,0,8" />
                 <TextBlock Text="Total Due" FontWeight="SemiBold" />
                 <TextBlock x:Name="PaymentTotalText" FontSize="24" FontWeight="Bold" Margin="0,6,0,12" />
                 <TextBlock Text="Payment Method" FontWeight="SemiBold" />
@@ -331,6 +366,18 @@
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
                             <TextBlock Text="Customer: " FontWeight="SemiBold" Width="140" />
                             <TextBlock x:Name="ReceiptCustomerNameText" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                            <TextBlock Text="Subtotal: " FontWeight="SemiBold" Width="140" />
+                            <TextBlock x:Name="ReceiptSubtotalText" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                            <TextBlock Text="Tax: " FontWeight="SemiBold" Width="140" />
+                            <TextBlock x:Name="ReceiptTaxText" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                            <TextBlock Text="Discount: " FontWeight="SemiBold" Width="140" />
+                            <TextBlock x:Name="ReceiptDiscountText" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Total: " FontWeight="SemiBold" Width="140" />
@@ -562,8 +609,8 @@
 
             <Grid Grid.Row="1" Margin="0,16,0,0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="3*" />
-                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="1.5*" />
+                    <ColumnDefinition Width="3.5*" />
                 </Grid.ColumnDefinitions>
                 <Border Grid.Column="0" BorderBrush="#D0D0D0" BorderThickness="1" Padding="8" Margin="0,0,12,0">
                     <ListView x:Name="RecentOrdersList" BorderBrush="#D0D0D0" BorderThickness="1" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Disabled" SelectionChanged="RecentOrdersList_OnSelectionChanged">

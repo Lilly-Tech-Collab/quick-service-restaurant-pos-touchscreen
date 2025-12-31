@@ -253,6 +253,37 @@ public class OrderService
         return order;
     }
 
+    public async Task<Order?> UpdateDiscountAsync(Guid orderId, int? discountCents, decimal? discountPercent)
+    {
+        var order = await _db.Orders
+            .Include(o => o.Items)
+            .ThenInclude(i => i.Customizations)
+            .FirstOrDefaultAsync(o => o.Id == orderId);
+        if (order is null)
+        {
+            return null;
+        }
+
+        var (subtotal, tax) = await CalculateTotalsAsync(order);
+        var baseTotal = subtotal + tax;
+
+        var resolvedDiscount = discountCents ?? 0;
+        if (discountPercent.HasValue)
+        {
+            resolvedDiscount = (int)Math.Round(baseTotal * (double)(discountPercent.Value / 100m));
+        }
+
+        resolvedDiscount = Math.Clamp(resolvedDiscount, 0, baseTotal);
+        order.DiscountCents = resolvedDiscount;
+        order.SubtotalCents = subtotal;
+        order.TaxCents = tax;
+        order.TotalCents = baseTotal - resolvedDiscount;
+
+        await SaveChangesWithRetryAsync();
+        await _db.Entry(order).Collection(o => o.Items).Query().Include(i => i.Customizations).LoadAsync();
+        return order;
+    }
+
     public async Task<bool> CancelOrderAsync(Guid orderId)
     {
         var order = await _db.Orders.FirstOrDefaultAsync(o => o.Id == orderId);
@@ -297,6 +328,14 @@ public class OrderService
 
     private async Task RecalculateTotalsAsync(Order order)
     {
+        var (subtotal, tax) = await CalculateTotalsAsync(order);
+        order.SubtotalCents = subtotal;
+        order.TaxCents = tax;
+        order.TotalCents = subtotal + tax - order.DiscountCents;
+    }
+
+    private async Task<(int Subtotal, int Tax)> CalculateTotalsAsync(Order order)
+    {
         var menuItemIds = order.Items.Select(i => i.MenuItemId).Distinct().ToList();
         var menuItems = await _db.MenuItems
             .Where(m => menuItemIds.Contains(m.Id))
@@ -316,9 +355,7 @@ public class OrderService
             }
         }
 
-        order.SubtotalCents = subtotal;
-        order.TaxCents = tax;
-        order.TotalCents = subtotal + tax - order.DiscountCents;
+        return (subtotal, tax);
     }
 
     private static void UpdateOrderItemNotes(OrderItem item)
