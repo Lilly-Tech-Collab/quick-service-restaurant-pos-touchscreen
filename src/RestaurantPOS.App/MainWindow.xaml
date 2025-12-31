@@ -20,7 +20,7 @@
             <StackPanel Grid.Row="1" HorizontalAlignment="Center" Width="320" Margin="0,16">
                 <TextBlock x:Name="RestaurantNameText" Text="Restaurant POS" FontSize="28" FontWeight="Bold" TextAlignment="Center" />
                 <TextBlock Text="Enter PIN" Margin="0,16,0,6" FontWeight="SemiBold" />
-                <PasswordBox x:Name="PinBox" FontSize="20" Height="40">
+                <PasswordBox x:Name="PinBox" FontSize="20" Height="40" PasswordChanged="PinBox_OnPasswordChanged">
                     <PasswordBox.InputScope>
                         <InputScope>
                             <InputScope.Names>
@@ -29,6 +29,20 @@
                         </InputScope>
                     </PasswordBox.InputScope>
                 </PasswordBox>
+                <UniformGrid Columns="3" Margin="0,12,0,0">
+                    <Button Content="1" Height="44" Click="PinButton_OnClick" />
+                    <Button Content="2" Height="44" Click="PinButton_OnClick" />
+                    <Button Content="3" Height="44" Click="PinButton_OnClick" />
+                    <Button Content="4" Height="44" Click="PinButton_OnClick" />
+                    <Button Content="5" Height="44" Click="PinButton_OnClick" />
+                    <Button Content="6" Height="44" Click="PinButton_OnClick" />
+                    <Button Content="7" Height="44" Click="PinButton_OnClick" />
+                    <Button Content="8" Height="44" Click="PinButton_OnClick" />
+                    <Button Content="9" Height="44" Click="PinButton_OnClick" />
+                    <Button Content="Clear" Height="44" Click="PinClearButton_OnClick" />
+                    <Button Content="0" Height="44" Click="PinButton_OnClick" />
+                    <Button Content="Back" Height="44" Click="PinBackspaceButton_OnClick" />
+                </UniformGrid>
                 <Button Content="Login" Margin="0,12,0,0" Height="36" Click="LoginButton_OnClick" />
                 <TextBlock x:Name="LoginStatusText" Margin="0,8,0,0" Foreground="DarkRed" TextWrapping="Wrap" />
             </StackPanel>

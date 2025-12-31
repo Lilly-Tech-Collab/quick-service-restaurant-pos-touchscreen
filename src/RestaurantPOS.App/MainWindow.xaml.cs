@@ -14,6 +14,7 @@ namespace RestaurantPOS.App;
 
 public partial class MainWindow : Window
 {
+    private const int PinLength = 4;
     private readonly AuthService _authService;
     private readonly MenuService _menuService;
     private readonly CustomizationService _customizationService;
@@ -39,6 +40,7 @@ public partial class MainWindow : Window
     private MenuItemEntity? _selectedAssignedCustomizationItem;
     private User? _selectedAdminUser;
     private bool _isUpdatingCustomerName;
+    private bool _isLoggingIn;
 
     public ObservableCollection<MenuCategory> Categories { get; } = new();
     public ObservableCollection<MenuItemEntity> MenuItems { get; } = new();
@@ -269,27 +271,113 @@ public partial class MainWindow : Window
 
     private async void LoginButton_OnClick(object sender, RoutedEventArgs e)
     {
+        await TryLoginAsync();
+    }
+
+    private async void PinBox_OnPasswordChanged(object sender, RoutedEventArgs e)
+    {
+        var pin = PinBox.Password.Trim();
+        if (pin.Length > PinLength)
+        {
+            PinBox.Password = pin[..PinLength];
+            PinBox.Focus();
+            return;
+        }
+
+        if (pin.Length == PinLength)
+        {
+            await TryLoginAsync();
+        }
+    }
+
+    private async void PinButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Button button)
+        {
+            return;
+        }
+
+        var digit = button.Content?.ToString();
+        if (string.IsNullOrWhiteSpace(digit))
+        {
+            return;
+        }
+
+        if (PinBox.Password.Length >= PinLength)
+        {
+            return;
+        }
+
+        PinBox.Password += digit;
+        PinBox.Focus();
+        if (PinBox.Password.Length == PinLength)
+        {
+            await TryLoginAsync();
+        }
+    }
+
+    private void PinClearButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        PinBox.Password = string.Empty;
+        LoginStatusText.Text = string.Empty;
+        PinBox.Focus();
+    }
+
+    private void PinBackspaceButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (PinBox.Password.Length == 0)
+        {
+            return;
+        }
+
+        PinBox.Password = PinBox.Password[..^1];
+        LoginStatusText.Text = string.Empty;
+        PinBox.Focus();
+    }
+
+    private async Task<bool> TryLoginAsync()
+    {
+        if (_isLoggingIn)
+        {
+            return false;
+        }
+
         var pin = PinBox.Password.Trim();
         if (string.IsNullOrWhiteSpace(pin))
         {
             LoginStatusText.Text = "Enter a PIN.";
-            return;
+            return false;
         }
 
-        var user = await _authService.ValidatePinAsync(pin);
-        if (user is null)
+        if (pin.Length < PinLength)
         {
-            LoginStatusText.Text = "Invalid PIN.";
-            return;
+            LoginStatusText.Text = $"Enter a {PinLength}-digit PIN.";
+            return false;
         }
 
-        _currentUser = user;
-        LoggedInText.Text = $"Logged in user: {user.DisplayName} ({user.Role})";
-        UpdateRoleButtons(user.Role);
-        _currentOrder = await _orderService.CreateOrderAsync(user);
-        UpdateOrderHeader(_currentOrder);
-        await RefreshTicketAsync();
-        ShowOrder();
+        _isLoggingIn = true;
+        try
+        {
+            var user = await _authService.ValidatePinAsync(pin);
+            if (user is null)
+            {
+                LoginStatusText.Text = "Invalid PIN.";
+                return false;
+            }
+
+            _currentUser = user;
+            LoggedInText.Text = $"Logged in user: {user.DisplayName} ({user.Role})";
+            UpdateRoleButtons(user.Role);
+            _currentOrder = await _orderService.CreateOrderAsync(user);
+            UpdateOrderHeader(_currentOrder);
+            await RefreshTicketAsync();
+            ShowOrder();
+            return true;
+        }
+        finally
+        {
+            _isLoggingIn = false;
+        }
     }
 
     private void LogoutButton_OnClick(object sender, RoutedEventArgs e)
