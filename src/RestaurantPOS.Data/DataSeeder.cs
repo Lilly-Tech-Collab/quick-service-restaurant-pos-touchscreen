@@ -36,6 +36,10 @@ public static class DataSeeder
     private static readonly Guid CustomizationNoCheeseId = Guid.Parse("f4a7e147-93a6-47de-9cc9-1706e3f54f90");
     private static readonly Guid CustomizationExtraCheeseId = Guid.Parse("6f1f0fd3-1224-4bcf-9f7e-93694dc43071");
     private static readonly Guid CustomizationExtraSauceId = Guid.Parse("7b1d6c2a-7d8f-4d6e-8071-71e483f3c4c6");
+    private static readonly Guid CustomizationAssignNoCheeseBurgersId = Guid.Parse("c52b4d10-8b4a-4c9a-9bb8-5412fd329f3c");
+    private static readonly Guid CustomizationAssignExtraCheeseBurgersId = Guid.Parse("d55f4b29-4bde-43b5-9d2b-1d35a0d0a257");
+    private static readonly Guid CustomizationAssignExtraSauceBurgersId = Guid.Parse("2a52b6d0-7c1b-4e0c-91a4-11e5f8b4f9f1");
+    private static readonly Guid CustomizationAssignExtraSauceSidesId = Guid.Parse("a7f1b0d1-73bb-4f29-a9b0-1d2d9e36d4f7");
 
     public static readonly User[] Users =
     {
@@ -231,6 +235,34 @@ public static class DataSeeder
             Name = "Extra Sauce",
             PriceCents = 25,
             IsActive = true
+        }
+    };
+
+    public static readonly CustomizationAssignment[] CustomizationAssignments =
+    {
+        new()
+        {
+            Id = CustomizationAssignNoCheeseBurgersId,
+            CustomizationItemId = CustomizationNoCheeseId,
+            MenuCategoryId = CategoryBurgersId
+        },
+        new()
+        {
+            Id = CustomizationAssignExtraCheeseBurgersId,
+            CustomizationItemId = CustomizationExtraCheeseId,
+            MenuCategoryId = CategoryBurgersId
+        },
+        new()
+        {
+            Id = CustomizationAssignExtraSauceBurgersId,
+            CustomizationItemId = CustomizationExtraSauceId,
+            MenuCategoryId = CategoryBurgersId
+        },
+        new()
+        {
+            Id = CustomizationAssignExtraSauceSidesId,
+            CustomizationItemId = CustomizationExtraSauceId,
+            MenuCategoryId = CategorySidesId
         }
     };
 

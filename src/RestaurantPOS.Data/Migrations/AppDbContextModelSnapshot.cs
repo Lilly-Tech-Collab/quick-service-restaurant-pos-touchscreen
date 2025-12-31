@@ -291,6 +291,64 @@ namespace RestaurantPOS.Data.Migrations
                         });
                 });
 
+            modelBuilder.Entity("RestaurantPOS.Domain.Entities.CustomizationAssignment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("CustomizationItemId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("MenuCategoryId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("MenuItemId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomizationItemId");
+
+                    b.HasIndex("MenuCategoryId");
+
+                    b.HasIndex("MenuItemId");
+
+                    b.ToTable("CustomizationAssignments", (string)null);
+
+                    b.HasCheckConstraint("CK_CustomizationAssignments_Target", "MenuItemId IS NOT NULL OR MenuCategoryId IS NOT NULL");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("c52b4d10-8b4a-4c9a-9bb8-5412fd329f3c"),
+                            CustomizationItemId = new Guid("f4a7e147-93a6-47de-9cc9-1706e3f54f90"),
+                            MenuCategoryId = new Guid("5b2b9638-b8b9-4b62-8c31-39aefbcb8c50"),
+                            MenuItemId = (Guid?)null
+                        },
+                        new
+                        {
+                            Id = new Guid("d55f4b29-4bde-43b5-9d2b-1d35a0d0a257"),
+                            CustomizationItemId = new Guid("6f1f0fd3-1224-4bcf-9f7e-93694dc43071"),
+                            MenuCategoryId = new Guid("5b2b9638-b8b9-4b62-8c31-39aefbcb8c50"),
+                            MenuItemId = (Guid?)null
+                        },
+                        new
+                        {
+                            Id = new Guid("2a52b6d0-7c1b-4e0c-91a4-11e5f8b4f9f1"),
+                            CustomizationItemId = new Guid("7b1d6c2a-7d8f-4d6e-8071-71e483f3c4c6"),
+                            MenuCategoryId = new Guid("5b2b9638-b8b9-4b62-8c31-39aefbcb8c50"),
+                            MenuItemId = (Guid?)null
+                        },
+                        new
+                        {
+                            Id = new Guid("a7f1b0d1-73bb-4f29-a9b0-1d2d9e36d4f7"),
+                            CustomizationItemId = new Guid("7b1d6c2a-7d8f-4d6e-8071-71e483f3c4c6"),
+                            MenuCategoryId = new Guid("5d6f9a8a-dfa0-4a1e-8844-0d9d41a76169"),
+                            MenuItemId = (Guid?)null
+                        });
+                });
+
             modelBuilder.Entity("RestaurantPOS.Domain.Entities.Order", b =>
                 {
                     b.Property<Guid>("Id")
@@ -474,6 +532,25 @@ namespace RestaurantPOS.Data.Migrations
                             PinHash = "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4",
                             Role = "Admin"
                         });
+                });
+
+            modelBuilder.Entity("RestaurantPOS.Domain.Entities.CustomizationAssignment", b =>
+                {
+                    b.HasOne("RestaurantPOS.Domain.Entities.CustomizationItem", null)
+                        .WithMany()
+                        .HasForeignKey("CustomizationItemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("RestaurantPOS.Domain.Entities.MenuCategory", null)
+                        .WithMany()
+                        .HasForeignKey("MenuCategoryId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("RestaurantPOS.Domain.Entities.MenuItem", null)
+                        .WithMany()
+                        .HasForeignKey("MenuItemId")
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("RestaurantPOS.Domain.Entities.MenuItem", b =>

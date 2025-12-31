@@ -177,6 +177,12 @@ public class OrderService
             return order;
         }
 
+        var allowed = await IsCustomizationAllowedAsync(item.MenuItemId, customization.Id);
+        if (!allowed)
+        {
+            return order;
+        }
+
         var orderCustomization = new OrderItemCustomization
         {
             OrderItemId = item.Id,
@@ -329,6 +335,16 @@ public class OrderService
     private static string FormatCents(int cents)
     {
         return string.Format("${0:0.00}", cents / 100.0);
+    }
+
+    private async Task<bool> IsCustomizationAllowedAsync(Guid menuItemId, Guid customizationId)
+    {
+        var itemAssignments = _db.CustomizationAssignments
+            .AsNoTracking()
+            .Where(a => a.MenuItemId == menuItemId);
+
+        return await itemAssignments.AnyAsync(a => a.CustomizationItemId == customizationId)
+            && await _db.CustomizationItems.AnyAsync(c => c.Id == customizationId && c.IsActive);
     }
 
     private async Task SaveChangesWithRetryAsync()

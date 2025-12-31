@@ -792,11 +792,12 @@
                                 </ListBox.ItemTemplate>
                             </ListBox>
                         </StackPanel>
-                        <StackPanel Grid.Column="1">
+                        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
+                            <StackPanel>
                             <TextBlock Text="Add Customization" FontWeight="SemiBold" />
                             <TextBlock Text="Name" Margin="0,8,0,0" />
                             <TextBox x:Name="CustomizationNameBox" Height="30" />
-                            <TextBlock Text="Price (cents)" Margin="0,8,0,0" />
+                            <TextBlock Text="Price (cents, optional)" Margin="0,8,0,0" />
                             <TextBox x:Name="CustomizationPriceBox" Height="30">
                                 <TextBox.InputScope>
                                     <InputScope>
@@ -812,7 +813,19 @@
                             <Button Content="Deactivate Customization" Margin="0,8,0,0" Height="32" Click="DeactivateCustomizationItemButton_OnClick" />
                             <Button Content="Delete Customization" Margin="0,8,0,0" Height="32" Click="DeleteCustomizationItemButton_OnClick" />
                             <TextBlock x:Name="CustomizationAdminStatusText" Margin="0,8,0,0" Foreground="DarkRed" TextWrapping="Wrap" />
-                        </StackPanel>
+                            <Separator Margin="0,12,0,12" />
+                            <TextBlock Text="Assign to Menu Items" FontWeight="SemiBold" />
+                            <TextBlock Text="Menu Item" Margin="0,8,0,0" />
+                            <ComboBox x:Name="CustomizationAssignMenuItemCombo" Height="30" DisplayMemberPath="Name" />
+                            <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                <Button Content="Assign to Item" Width="140" Height="32" Click="AssignCustomizationMenuItemButton_OnClick" />
+                                <Button Content="Remove Assignment" Margin="8,0,0,0" Width="160" Height="32" Click="RemoveCustomizationMenuItemButton_OnClick" />
+                            </StackPanel>
+                            <TextBlock Text="Assigned Items" Margin="0,12,0,0" />
+                            <ListBox x:Name="CustomizationAssignedItemsList" Height="140" DisplayMemberPath="Name" SelectionChanged="CustomizationAssignedItemsList_OnSelectionChanged" />
+                            <TextBlock x:Name="CustomizationAssignmentStatusText" Margin="0,8,0,0" Foreground="DarkRed" TextWrapping="Wrap" />
+                            </StackPanel>
+                        </ScrollViewer>
                     </Grid>
                 </TabItem>
 

@@ -36,6 +36,7 @@ public partial class MainWindow : Window
     private MenuCategory? _selectedAdminCategory;
     private MenuItemEntity? _selectedAdminMenuItem;
     private CustomizationItem? _selectedAdminCustomization;
+    private MenuItemEntity? _selectedAssignedCustomizationItem;
     private User? _selectedAdminUser;
     private bool _isUpdatingCustomerName;
 
@@ -48,6 +49,7 @@ public partial class MainWindow : Window
     public ObservableCollection<MenuCategory> AdminCategories { get; } = new();
     public ObservableCollection<MenuItemEntity> AdminMenuItems { get; } = new();
     public ObservableCollection<CustomizationItem> AdminCustomizations { get; } = new();
+    public ObservableCollection<MenuItemEntity> AdminCustomizationAssignedItems { get; } = new();
     public ObservableCollection<User> AdminUsers { get; } = new();
     public ObservableCollection<ReportOrderRow> ReportOrders { get; } = new();
     public ObservableCollection<ReportItemRow> ReportItemSales { get; } = new();
@@ -86,6 +88,8 @@ public partial class MainWindow : Window
         AdminCategoriesList.ItemsSource = AdminCategories;
         AdminMenuItemsList.ItemsSource = AdminMenuItems;
         AdminCustomizationsList.ItemsSource = AdminCustomizations;
+        CustomizationAssignMenuItemCombo.ItemsSource = AdminMenuItems;
+        CustomizationAssignedItemsList.ItemsSource = AdminCustomizationAssignedItems;
         AdminUsersList.ItemsSource = AdminUsers;
         ReportOrdersList.ItemsSource = ReportOrders;
         ReportItemSalesList.ItemsSource = ReportItemSales;
@@ -169,7 +173,14 @@ public partial class MainWindow : Window
     private async Task LoadCustomizationsAsync()
     {
         Customizations.Clear();
-        var items = await _customizationService.GetCustomizationsAsync();
+        _selectedCustomizationItem = null;
+
+        if (_selectedOrderItem is null)
+        {
+            return;
+        }
+
+        var items = await _customizationService.GetCustomizationsForMenuItemAsync(_selectedOrderItem.MenuItemId);
         foreach (var item in items)
         {
             Customizations.Add(item);
@@ -288,6 +299,7 @@ public partial class MainWindow : Window
         _lastPaidOrder = null;
         ReceiptItems.Clear();
         TicketItems.Clear();
+        Customizations.Clear();
         SelectedOrderCustomizations.Clear();
         CustomizationStatusText.Text = string.Empty;
         CustomerNameBox.Text = string.Empty;
@@ -344,7 +356,7 @@ public partial class MainWindow : Window
         await RefreshTicketAsync();
     }
 
-    private void TicketItemsList_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+    private async void TicketItemsList_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (_isUpdatingTicketSelection)
         {
@@ -354,6 +366,7 @@ public partial class MainWindow : Window
         _selectedOrderItem = TicketItemsList.SelectedItem as OrderItem;
         UpdateSelectedOrderCustomizations(_selectedOrderItem);
         CustomizationStatusText.Text = string.Empty;
+        await LoadCustomizationsAsync();
     }
 
     private async void TicketItemsList_OnItemTapped(object sender, MouseButtonEventArgs e)
@@ -377,6 +390,7 @@ public partial class MainWindow : Window
         _selectedOrderItem = selectedItem;
         TicketItemsList.SelectedItem = selectedItem;
         UpdateSelectedOrderCustomizations(_selectedOrderItem);
+        await LoadCustomizationsAsync();
     }
 
     private static TItem? GetItemFromEvent<TItem>(ItemsControl list, object originalSource)
@@ -985,7 +999,9 @@ public partial class MainWindow : Window
             return;
         }
 
-        if (!int.TryParse(CustomizationPriceBox.Text.Trim(), out var priceCents))
+        var priceText = CustomizationPriceBox.Text.Trim();
+        var priceCents = 0;
+        if (!string.IsNullOrWhiteSpace(priceText) && !int.TryParse(priceText, out priceCents))
         {
             CustomizationAdminStatusText.Text = "Price must be an integer number of cents.";
             return;
@@ -1016,7 +1032,9 @@ public partial class MainWindow : Window
             return;
         }
 
-        if (!int.TryParse(CustomizationPriceBox.Text.Trim(), out var priceCents))
+        var priceText = CustomizationPriceBox.Text.Trim();
+        var priceCents = 0;
+        if (!string.IsNullOrWhiteSpace(priceText) && !int.TryParse(priceText, out priceCents))
         {
             CustomizationAdminStatusText.Text = "Price must be an integer number of cents.";
             return;
@@ -1058,13 +1076,54 @@ public partial class MainWindow : Window
         var deleted = await _customizationService.DeleteCustomizationAsync(_selectedAdminCustomization.Id);
         if (!deleted)
         {
-            CustomizationAdminStatusText.Text = "Cannot delete customization with orders.";
+            CustomizationAdminStatusText.Text = "Cannot delete customization with orders or assignments.";
             return;
         }
 
         CustomizationAdminStatusText.Text = "Customization deleted.";
         await RefreshAdminDataAsync();
         await LoadCustomizationsAsync();
+    }
+
+    private async void AssignCustomizationMenuItemButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (_selectedAdminCustomization is null)
+        {
+            CustomizationAssignmentStatusText.Text = "Select a customization first.";
+            return;
+        }
+
+        var menuItem = CustomizationAssignMenuItemCombo.SelectedItem as MenuItemEntity;
+        if (menuItem is null)
+        {
+            CustomizationAssignmentStatusText.Text = "Select a menu item to assign.";
+            return;
+        }
+
+        var added = await _customizationService.AssignCustomizationToMenuItemAsync(_selectedAdminCustomization.Id, menuItem.Id);
+        CustomizationAssignmentStatusText.Text = added ? "Assignment added." : "Customization already assigned to that item.";
+        await LoadCustomizationAssignmentsAsync();
+    }
+
+    private async void RemoveCustomizationMenuItemButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (_selectedAdminCustomization is null)
+        {
+            CustomizationAssignmentStatusText.Text = "Select a customization first.";
+            return;
+        }
+
+        if (_selectedAssignedCustomizationItem is null)
+        {
+            CustomizationAssignmentStatusText.Text = "Select an assigned menu item to remove.";
+            return;
+        }
+
+        var removed = await _customizationService.RemoveCustomizationFromMenuItemAsync(
+            _selectedAdminCustomization.Id,
+            _selectedAssignedCustomizationItem.Id);
+        CustomizationAssignmentStatusText.Text = removed ? "Assignment removed." : "Assignment not found.";
+        await LoadCustomizationAssignmentsAsync();
     }
 
     private async void AddUserButton_OnClick(object sender, RoutedEventArgs e)
@@ -1169,6 +1228,7 @@ public partial class MainWindow : Window
             UpdateTotalsDisplay(null);
             UpdateSelectedOrderCustomizations(null);
             UpdateOrderHeader(null);
+            await LoadCustomizationsAsync();
             return;
         }
 
@@ -1179,11 +1239,13 @@ public partial class MainWindow : Window
             UpdateTotalsDisplay(null);
             UpdateSelectedOrderCustomizations(null);
             UpdateOrderHeader(null);
+            await LoadCustomizationsAsync();
             return;
         }
 
         UpdateOrderHeader(order);
         UpdateTicketFromOrder(order);
+        await LoadCustomizationsAsync();
     }
 
     private void UpdateTotalsDisplay(Order? order)
@@ -1426,6 +1488,7 @@ public partial class MainWindow : Window
         CategoryStatusText.Text = string.Empty;
         MenuItemStatusText.Text = string.Empty;
         CustomizationAdminStatusText.Text = string.Empty;
+        CustomizationAssignmentStatusText.Text = string.Empty;
         UserStatusText.Text = string.Empty;
         RestaurantNameStatusText.Text = string.Empty;
         OrderNumberResetStatusText.Text = string.Empty;
@@ -1490,6 +1553,24 @@ public partial class MainWindow : Window
         }
 
         await LoadOrderNumberResetModeAsync();
+        await LoadCustomizationAssignmentsAsync();
+    }
+
+    private async Task LoadCustomizationAssignmentsAsync()
+    {
+        AdminCustomizationAssignedItems.Clear();
+        _selectedAssignedCustomizationItem = null;
+
+        if (_selectedAdminCustomization is null)
+        {
+            return;
+        }
+
+        var items = await _customizationService.GetAssignedMenuItemsAsync(_selectedAdminCustomization.Id);
+        foreach (var item in items)
+        {
+            AdminCustomizationAssignedItems.Add(item);
+        }
     }
 
     private void AdminCategoriesList_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -1533,6 +1614,8 @@ public partial class MainWindow : Window
         _selectedAdminCustomization = AdminCustomizationsList.SelectedItem as CustomizationItem;
         if (_selectedAdminCustomization is null)
         {
+            AdminCustomizationAssignedItems.Clear();
+            _selectedAssignedCustomizationItem = null;
             return;
         }
 
@@ -1540,6 +1623,13 @@ public partial class MainWindow : Window
         CustomizationPriceBox.Text = _selectedAdminCustomization.PriceCents.ToString();
         CustomizationActiveCheck.IsChecked = _selectedAdminCustomization.IsActive;
         CustomizationAdminStatusText.Text = string.Empty;
+        _ = LoadCustomizationAssignmentsAsync();
+    }
+
+    private void CustomizationAssignedItemsList_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        _selectedAssignedCustomizationItem = CustomizationAssignedItemsList.SelectedItem as MenuItemEntity;
+        CustomizationAssignmentStatusText.Text = string.Empty;
     }
 
     private void AdminUsersList_OnSelectionChanged(object sender, SelectionChangedEventArgs e)

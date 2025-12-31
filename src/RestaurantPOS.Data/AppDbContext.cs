@@ -11,6 +11,7 @@ public class AppDbContext : DbContext
     public DbSet<MenuCategory> MenuCategories => Set<MenuCategory>();
     public DbSet<MenuItem> MenuItems => Set<MenuItem>();
     public DbSet<CustomizationItem> CustomizationItems => Set<CustomizationItem>();
+    public DbSet<CustomizationAssignment> CustomizationAssignments => Set<CustomizationAssignment>();
     public DbSet<Order> Orders => Set<Order>();
     public DbSet<OrderItem> OrderItems => Set<OrderItem>();
     public DbSet<OrderItemCustomization> OrderItemCustomizations => Set<OrderItemCustomization>();
@@ -72,6 +73,31 @@ public class AppDbContext : DbContext
             e.Property(x => x.Name).IsRequired().HasMaxLength(200);
             e.Property(x => x.PriceCents).IsRequired();
             e.Property(x => x.IsActive).IsRequired();
+        });
+
+        modelBuilder.Entity<CustomizationAssignment>(e =>
+        {
+            e.ToTable("CustomizationAssignments", t =>
+                t.HasCheckConstraint(
+                    "CK_CustomizationAssignments_Target",
+                    "MenuItemId IS NOT NULL OR MenuCategoryId IS NOT NULL"));
+            e.HasKey(x => x.Id);
+            e.Property(x => x.CustomizationItemId).IsRequired();
+            e.HasOne<CustomizationItem>()
+                .WithMany()
+                .HasForeignKey(x => x.CustomizationItemId)
+                .OnDelete(DeleteBehavior.Restrict);
+            e.HasOne<MenuItem>()
+                .WithMany()
+                .HasForeignKey(x => x.MenuItemId)
+                .OnDelete(DeleteBehavior.Restrict);
+            e.HasOne<MenuCategory>()
+                .WithMany()
+                .HasForeignKey(x => x.MenuCategoryId)
+                .OnDelete(DeleteBehavior.Restrict);
+            e.HasIndex(x => x.CustomizationItemId);
+            e.HasIndex(x => x.MenuItemId);
+            e.HasIndex(x => x.MenuCategoryId);
         });
 
         modelBuilder.Entity<Order>(e =>
@@ -141,5 +167,6 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<MenuCategory>().HasData(DataSeeder.Categories);
         modelBuilder.Entity<MenuItem>().HasData(DataSeeder.MenuItems);
         modelBuilder.Entity<CustomizationItem>().HasData(DataSeeder.CustomizationItems);
+        modelBuilder.Entity<CustomizationAssignment>().HasData(DataSeeder.CustomizationAssignments);
     }
 }
