@@ -207,13 +207,13 @@
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="40" />
                                 <ColumnDefinition Width="*" SharedSizeGroup="TicketItem" />
-                                <ColumnDefinition Width="60" SharedSizeGroup="TicketQty" />
-                                <ColumnDefinition Width="90" SharedSizeGroup="TicketPrice" />
+                                <ColumnDefinition Width="110" SharedSizeGroup="TicketQty" />
+                                <ColumnDefinition Width="140" SharedSizeGroup="TicketPrice" />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="#" FontWeight="Bold" />
-                            <TextBlock Grid.Column="1" Text="Item" FontWeight="Bold" />
-                            <TextBlock Grid.Column="2" Text="Qty" FontWeight="Bold" TextAlignment="Right" />
-                            <TextBlock Grid.Column="3" Text="Price" FontWeight="Bold" TextAlignment="Right" />
+                            <TextBlock Text="#" FontWeight="Bold" Margin="17,0,0,0" />
+                            <TextBlock Grid.Column="1" Text="Item" FontWeight="Bold" Margin="16,0,0,0" />
+                            <TextBlock Grid.Column="2" Text="Qty" FontWeight="Bold" TextAlignment="Right" HorizontalAlignment="Right" Margin="0,0,0,0" />
+                            <TextBlock Grid.Column="3" Text="Price" FontWeight="Bold" TextAlignment="Right" HorizontalAlignment="Right" Margin="0,0,8,0" />
                         </Grid>
                         <ListBox x:Name="TicketItemsList" Grid.Row="1" AlternationCount="10000" SelectionChanged="TicketItemsList_OnSelectionChanged" PreviewMouseLeftButtonUp="TicketItemsList_OnItemTapped" PreviewTouchUp="TicketItemsList_OnItemTouched" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Visible">
                             <ListBox.ItemTemplate>
@@ -227,13 +227,13 @@
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="40" />
                                                 <ColumnDefinition Width="*" SharedSizeGroup="TicketItem" />
-                                                <ColumnDefinition Width="60" SharedSizeGroup="TicketQty" />
-                                                <ColumnDefinition Width="90" SharedSizeGroup="TicketPrice" />
+                                                <ColumnDefinition Width="110" SharedSizeGroup="TicketQty" />
+                                                <ColumnDefinition Width="140" SharedSizeGroup="TicketPrice" />
                                             </Grid.ColumnDefinitions>
                                             <TextBlock Text="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=(ItemsControl.AlternationIndex), Converter={StaticResource OneBasedIndexConverter}}" />
                                             <TextBlock Grid.Column="1" Text="{Binding NameSnapshot}" FontWeight="SemiBold" />
-                                            <TextBlock Grid.Column="2" Text="{Binding Qty}" TextAlignment="Right" />
-                                            <TextBlock Grid.Column="3" Text="{Binding LineTotalCents}" TextAlignment="Right" />
+                                            <TextBlock Grid.Column="2" Text="{Binding Qty}" TextAlignment="Right" Margin="0,0,21,0" />
+                                            <TextBlock Grid.Column="3" Text="{Binding LineTotalCents}" TextAlignment="Right" Margin="0,0,31,0" />
                                         </Grid>
                                         <ItemsControl Grid.Row="1" ItemsSource="{Binding Customizations}" Margin="0,2,0,0">
                                             <ItemsControl.ItemTemplate>
