@@ -80,16 +80,6 @@
                 </Border>
                 <DockPanel LastChildFill="False">
                     <TextBlock Text="Customer Order" FontSize="22" FontWeight="Bold" DockPanel.Dock="Left" Margin="0,0,16,0" />
-                    <StackPanel DockPanel.Dock="Right" Orientation="Vertical" HorizontalAlignment="Right">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,6">
-                            <TextBlock Text="Customer Order #" FontWeight="SemiBold" Margin="0,0,6,0" />
-                            <TextBlock x:Name="OrderNumberText" FontWeight="SemiBold" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                            <TextBlock Text="Customer Name" FontWeight="SemiBold" Margin="0,0,6,0" />
-                            <TextBox x:Name="CustomerNameBox" Width="200" Margin="0,0,6,0" LostFocus="CustomerNameBox_OnLostFocus" />
-                        </StackPanel>
-                    </StackPanel>
                 </DockPanel>
             </StackPanel>
 
@@ -224,7 +214,7 @@
                             <TextBlock Grid.Column="1" Text="Qty" FontWeight="Bold" TextAlignment="Right" />
                             <TextBlock Grid.Column="2" Text="Price" FontWeight="Bold" TextAlignment="Right" />
                         </Grid>
-                        <ListBox x:Name="TicketItemsList" Grid.Row="1" MinHeight="520" SelectionChanged="TicketItemsList_OnSelectionChanged" PreviewMouseLeftButtonUp="TicketItemsList_OnItemTapped" PreviewTouchUp="TicketItemsList_OnItemTouched">
+                        <ListBox x:Name="TicketItemsList" Grid.Row="1" MinHeight="1200" SelectionChanged="TicketItemsList_OnSelectionChanged" PreviewMouseLeftButtonUp="TicketItemsList_OnItemTapped" PreviewTouchUp="TicketItemsList_OnItemTouched">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <Grid Margin="4">
@@ -264,45 +254,67 @@
                 </DockPanel>
             </Grid>
 
-            <DockPanel Grid.Row="2" Grid.ColumnSpan="2" Margin="0,4,0,0">
-                <StackPanel DockPanel.Dock="Left">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Subtotal: " FontWeight="Bold" FontSize="16" />
-                        <TextBlock x:Name="SubtotalText" Margin="0,0,16,0" FontWeight="Bold" FontSize="16" />
-                        <TextBlock Text="Tax: " FontWeight="Bold" FontSize="16" />
-                        <TextBlock x:Name="TaxText" Margin="0,0,16,0" FontWeight="Bold" FontSize="16" />
-                        <TextBlock Text="Discount: " FontWeight="Bold" FontSize="16" />
-                        <TextBlock x:Name="DiscountText" Margin="0,0,16,0" FontWeight="Bold" FontSize="16" />
-                        <TextBlock Text="Total: " FontWeight="Bold" FontSize="18" />
-                        <TextBlock x:Name="TotalText" FontWeight="Bold" FontSize="18" />
+            <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Margin="0,4,0,0">
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Left">
+                    <Grid Margin="0,0,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Subtotal: " FontWeight="Bold" FontSize="16" />
+                            <TextBlock x:Name="SubtotalText" Margin="0,0,16,0" FontWeight="Bold" FontSize="16" />
+                            <TextBlock Text="Tax: " FontWeight="Bold" FontSize="16" />
+                            <TextBlock x:Name="TaxText" Margin="0,0,16,0" FontWeight="Bold" FontSize="16" />
+                            <TextBlock Text="Discount: " FontWeight="Bold" FontSize="16" />
+                            <TextBlock x:Name="DiscountText" Margin="0,0,16,0" FontWeight="Bold" FontSize="16" />
+                            <TextBlock Text="Total: " FontWeight="Bold" FontSize="18" />
+                            <TextBlock x:Name="TotalText" FontWeight="Bold" FontSize="18" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                            <TextBlock Text="Customer Order #" FontWeight="SemiBold" Margin="0,0,6,0" VerticalAlignment="Center" />
+                            <TextBlock x:Name="OrderNumberText" FontWeight="SemiBold" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Grid>
+                    <Grid Margin="0,8,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Discount (cents)" FontWeight="SemiBold" VerticalAlignment="Center" />
+                            <TextBox x:Name="OrderDiscountAmountBox" Width="90" Margin="6,0,12,0">
+                                <TextBox.InputScope>
+                                    <InputScope>
+                                        <InputScope.Names>
+                                            <InputScopeName NameValue="Number" />
+                                        </InputScope.Names>
+                                    </InputScope>
+                                </TextBox.InputScope>
+                            </TextBox>
+                            <TextBlock Text="Discount (%)" FontWeight="SemiBold" VerticalAlignment="Center" />
+                            <TextBox x:Name="OrderDiscountPercentBox" Width="70" Margin="6,0,12,0">
+                                <TextBox.InputScope>
+                                    <InputScope>
+                                        <InputScope.Names>
+                                            <InputScopeName NameValue="Number" />
+                                        </InputScope.Names>
+                                    </InputScope>
+                                </TextBox.InputScope>
+                            </TextBox>
+                            <Button Content="Apply Discount" Height="32" Click="ApplyOrderDiscountButton_OnClick" />
+                            <Button Content="Clear Discount" Margin="8,0,0,0" Height="32" Click="ClearOrderDiscountButton_OnClick" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                            <TextBlock Text="Customer Name" FontWeight="SemiBold" Margin="0,0,6,0" VerticalAlignment="Center" />
+                            <TextBox x:Name="CustomerNameBox" Width="200" Margin="0,0,6,0" LostFocus="CustomerNameBox_OnLostFocus" />
+                        </StackPanel>
+                    </Grid>
+                        <TextBlock x:Name="DiscountStatusText" Margin="0,6,0,0" Foreground="DarkRed" TextWrapping="Wrap" />
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
-                        <TextBlock Text="Discount (cents)" FontWeight="SemiBold" VerticalAlignment="Center" />
-                        <TextBox x:Name="OrderDiscountAmountBox" Width="90" Margin="6,0,12,0">
-                            <TextBox.InputScope>
-                                <InputScope>
-                                    <InputScope.Names>
-                                        <InputScopeName NameValue="Number" />
-                                    </InputScope.Names>
-                                </InputScope>
-                            </TextBox.InputScope>
-                        </TextBox>
-                        <TextBlock Text="Discount (%)" FontWeight="SemiBold" VerticalAlignment="Center" />
-                        <TextBox x:Name="OrderDiscountPercentBox" Width="70" Margin="6,0,12,0">
-                            <TextBox.InputScope>
-                                <InputScope>
-                                    <InputScope.Names>
-                                        <InputScopeName NameValue="Number" />
-                                    </InputScope.Names>
-                                </InputScope>
-                            </TextBox.InputScope>
-                        </TextBox>
-                        <Button Content="Apply Discount" Height="32" Click="ApplyOrderDiscountButton_OnClick" />
-                        <Button Content="Clear Discount" Margin="8,0,0,0" Height="32" Click="ClearOrderDiscountButton_OnClick" />
-                    </StackPanel>
-                    <TextBlock x:Name="DiscountStatusText" Margin="0,6,0,0" Foreground="DarkRed" TextWrapping="Wrap" />
-                </StackPanel>
-            </DockPanel>
+                </DockPanel>
+            </StackPanel>
         </Grid>
 
         <Grid x:Name="PaymentPanel" Visibility="Collapsed">
@@ -606,8 +618,8 @@
 
             <Grid Grid.Row="1" Margin="0,16,0,0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1.5*" />
-                    <ColumnDefinition Width="3.5*" />
+                    <ColumnDefinition Width="1.2*" />
+                    <ColumnDefinition Width="3.8*" />
                 </Grid.ColumnDefinitions>
                 <Border Grid.Column="0" BorderBrush="#D0D0D0" BorderThickness="1" Padding="8" Margin="0,0,12,0">
                     <ListView x:Name="RecentOrdersList" BorderBrush="#D0D0D0" BorderThickness="1" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Disabled" SelectionChanged="RecentOrdersList_OnSelectionChanged">
