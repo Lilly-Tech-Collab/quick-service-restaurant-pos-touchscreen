@@ -124,6 +124,18 @@ public class OrderService
             .ThenInclude(i => i.Customizations)
             .FirstAsync(o => o.Id == orderId);
 
+        var existing = order.Items.FirstOrDefault(i =>
+            i.MenuItemId == menuItem.Id && i.Customizations.Count == 0);
+        if (existing is not null)
+        {
+            existing.Qty += 1;
+            existing.LineTotalCents = (existing.UnitPriceCents) * existing.Qty;
+            await RecalculateTotalsAsync(order);
+            await SaveChangesWithRetryAsync();
+            await _db.Entry(order).Collection(o => o.Items).Query().Include(i => i.Customizations).LoadAsync();
+            return (order, existing);
+        }
+
         var item = new OrderItem
         {
             OrderId = order.Id,
@@ -155,8 +167,15 @@ public class OrderService
             return order;
         }
 
-        order.Items.Remove(item);
-        _db.OrderItems.Remove(item);
+        if (item.Qty > 1)
+        {
+            item.Qty -= 1;
+        }
+        else
+        {
+            order.Items.Remove(item);
+            _db.OrderItems.Remove(item);
+        }
 
         await RecalculateTotalsAsync(order);
         await SaveChangesWithRetryAsync();
