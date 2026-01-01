@@ -1866,7 +1866,7 @@ public partial class MainWindow : Window
         RestaurantNameText.Text = name;
         AdminRestaurantNameText.Text = name;
         RestaurantNameBox.Text = name;
-        Title = name;
+        Title = $"Customer Order - {name}";
     }
 
     private async Task LoadOrderNumberResetModeAsync()

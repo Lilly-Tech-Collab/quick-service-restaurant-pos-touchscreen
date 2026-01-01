@@ -78,10 +78,7 @@
                         </StackPanel>
                     </DockPanel>
                 </Border>
-                <DockPanel LastChildFill="False">
-                    <TextBlock Text="Customer Order" FontSize="22" FontWeight="Bold" DockPanel.Dock="Left" Margin="0,0,16,0" />
-                    <TextBlock Text="Ticket" FontSize="22" FontWeight="Bold" DockPanel.Dock="Right" />
-                </DockPanel>
+                <DockPanel LastChildFill="False" />
             </StackPanel>
 
             <Grid Grid.Row="1" Grid.Column="0" Margin="0,0,12,0">
@@ -145,6 +142,7 @@
                 </Grid>
 
                 <DockPanel Grid.Column="1" LastChildFill="True">
+                    <TextBlock Text="Ticket" FontWeight="SemiBold" DockPanel.Dock="Top" />
                     <StackPanel DockPanel.Dock="Bottom" Margin="0,8,0,0">
                         <Button Content="Remove Item" Height="32" Click="RemoveItemButton_OnClick" />
                         <Grid Margin="0,8,0,0">
