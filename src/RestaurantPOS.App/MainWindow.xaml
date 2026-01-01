@@ -212,7 +212,7 @@
                             <TextBlock Grid.Column="1" Text="Qty" FontWeight="Bold" TextAlignment="Right" />
                             <TextBlock Grid.Column="2" Text="Price" FontWeight="Bold" TextAlignment="Right" />
                         </Grid>
-                        <ListBox x:Name="TicketItemsList" Grid.Row="1" MinHeight="1200" SelectionChanged="TicketItemsList_OnSelectionChanged" PreviewMouseLeftButtonUp="TicketItemsList_OnItemTapped" PreviewTouchUp="TicketItemsList_OnItemTouched">
+                        <ListBox x:Name="TicketItemsList" Grid.Row="1" SelectionChanged="TicketItemsList_OnSelectionChanged" PreviewMouseLeftButtonUp="TicketItemsList_OnItemTapped" PreviewTouchUp="TicketItemsList_OnItemTouched" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Visible">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <Grid Margin="4">
