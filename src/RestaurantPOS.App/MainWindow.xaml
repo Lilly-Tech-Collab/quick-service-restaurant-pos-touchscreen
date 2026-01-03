@@ -341,7 +341,7 @@
                 <ComboBox x:Name="PaymentMethodCombo" Height="32" />
             </StackPanel>
 
-            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,4,0,16">
                 <Button Content="Back" Margin="0,0,8,0" Width="100" Click="BackToOrderButton_OnClick" />
                 <Button Content="Confirm Payment" Width="160" Click="ConfirmPaymentButton_OnClick" />
             </StackPanel>
