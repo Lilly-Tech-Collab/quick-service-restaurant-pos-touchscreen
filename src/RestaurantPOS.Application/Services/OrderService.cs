@@ -141,6 +141,7 @@ public class OrderService
             OrderId = order.Id,
             MenuItemId = menuItem.Id,
             NameSnapshot = menuItem.Name,
+            CreatedAt = DateTime.UtcNow,
             UnitPriceCents = menuItem.PriceCents,
             Qty = 1,
             LineTotalCents = menuItem.PriceCents
@@ -151,6 +152,7 @@ public class OrderService
         await RecalculateTotalsAsync(order);
         await SaveChangesWithRetryAsync();
         await _db.Entry(order).Collection(o => o.Items).Query().Include(i => i.Customizations).LoadAsync();
+        SortOrderItems(order);
         return (order, item);
     }
 
@@ -180,6 +182,7 @@ public class OrderService
         await RecalculateTotalsAsync(order);
         await SaveChangesWithRetryAsync();
         await _db.Entry(order).Collection(o => o.Items).Query().Include(i => i.Customizations).LoadAsync();
+        SortOrderItems(order);
         return order;
     }
 
@@ -217,6 +220,7 @@ public class OrderService
         await RecalculateTotalsAsync(order);
         await SaveChangesWithRetryAsync();
         await _db.Entry(order).Collection(o => o.Items).Query().Include(i => i.Customizations).LoadAsync();
+        SortOrderItems(order);
         return order;
     }
 
@@ -246,16 +250,23 @@ public class OrderService
         await RecalculateTotalsAsync(order);
         await SaveChangesWithRetryAsync();
         await _db.Entry(order).Collection(o => o.Items).Query().Include(i => i.Customizations).LoadAsync();
+        SortOrderItems(order);
         return order;
     }
 
     public async Task<Order?> GetOrderAsync(Guid orderId)
     {
-        return await _db.Orders
+        var order = await _db.Orders
             .AsNoTracking()
             .Include(o => o.Items)
             .ThenInclude(i => i.Customizations)
             .FirstOrDefaultAsync(o => o.Id == orderId);
+        if (order is not null)
+        {
+            SortOrderItems(order);
+        }
+
+        return order;
     }
 
     public async Task<Order?> UpdateCustomerNameAsync(Guid orderId, string? customerName)
@@ -391,6 +402,14 @@ public class OrderService
     private static string FormatCents(int cents)
     {
         return string.Format("${0:0.00}", cents / 100.0);
+    }
+
+    private static void SortOrderItems(Order order)
+    {
+        order.Items = order.Items
+            .OrderBy(i => i.CreatedAt)
+            .ThenBy(i => i.Id)
+            .ToList();
     }
 
     private async Task<bool> IsCustomizationAllowedAsync(Guid menuItemId, Guid customizationId)

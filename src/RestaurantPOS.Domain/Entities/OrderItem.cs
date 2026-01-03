@@ -6,6 +6,7 @@ public class OrderItem
     public Guid OrderId { get; set; }
     public Guid MenuItemId { get; set; }
     public string NameSnapshot { get; set; } = "";
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public int UnitPriceCents { get; set; }
     public int Qty { get; set; }
     public int LineTotalCents { get; set; }

@@ -402,6 +402,9 @@ namespace RestaurantPOS.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("LineTotalCents")
                         .HasColumnType("INTEGER");
 

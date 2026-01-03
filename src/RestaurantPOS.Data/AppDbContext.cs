@@ -128,6 +128,7 @@ public class AppDbContext : DbContext
             e.ToTable("OrderItems");
             e.HasKey(x => x.Id);
             e.Property(x => x.NameSnapshot).IsRequired().HasMaxLength(200);
+            e.Property(x => x.CreatedAt).IsRequired();
             e.Property(x => x.UnitPriceCents).IsRequired();
             e.Property(x => x.Qty).IsRequired();
             e.Property(x => x.LineTotalCents).IsRequired();
