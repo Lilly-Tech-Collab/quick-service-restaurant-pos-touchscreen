@@ -1,0 +1,9 @@
+flowchart LR
+    classDef title fill:#111827,color:#ffffff,stroke:#111827,stroke-width:1px;
+    classDef step fill:#dcfce7,color:#14532d,stroke:#22c55e,stroke-width:1px;
+    classDef accent fill:#fef3c7,color:#7c2d12,stroke:#f59e0b,stroke-width:2px;
+
+    T["Customer Success Path"]:::title --> On["Onboarding"]:::step
+    On --> Tr["Training"]:::step
+    Tr --> Su["Live support"]:::step
+    Su --> Up["Product updates"]:::accent

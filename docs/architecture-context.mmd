@@ -1,0 +1,24 @@
+flowchart LR
+    Customer((Customer))
+    Cashier((Cashier))
+    Manager((Manager))
+
+    subgraph POS[Restaurant POS Touchscreen App]
+        App[WPF Desktop App]
+    end
+
+    Printer[Receipt Printer]
+    Drawer[Cash Drawer]
+    Display[Kitchen/Prep Display]
+    Payments[Payment Processor]
+    Reports[Reports/Analytics Export]
+
+    Customer --> App
+    Cashier --> App
+    Manager --> App
+
+    App --> Printer
+    App --> Drawer
+    App --> Display
+    App --> Payments
+    App --> Reports

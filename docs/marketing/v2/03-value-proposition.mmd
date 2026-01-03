@@ -1,0 +1,29 @@
+flowchart TB
+    classDef title fill:#111827,color:#ffffff,stroke:#111827,stroke-width:1px;
+    classDef owner fill:#fef3c7,color:#7c2d12,stroke:#f59e0b,stroke-width:1px;
+    classDef manager fill:#e0f2fe,color:#0f172a,stroke:#38bdf8,stroke-width:1px;
+    classDef staff fill:#dcfce7,color:#14532d,stroke:#22c55e,stroke-width:1px;
+
+    T["Value Proposition by Role"]:::title
+
+    subgraph Owners["Owners"]
+        O1["Profit visibility"]:::owner
+        O2["Lower costs"]:::owner
+        O3["Scalable growth"]:::owner
+    end
+
+    subgraph Managers["Managers"]
+        M1["Real-time reports"]:::manager
+        M2["Policy control"]:::manager
+        M3["Menu agility"]:::manager
+    end
+
+    subgraph Staff["Staff"]
+        S1["Fast training"]:::staff
+        S2["Fewer clicks"]:::staff
+        S3["Confident service"]:::staff
+    end
+
+    T --> Owners
+    T --> Managers
+    T --> Staff

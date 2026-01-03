@@ -1,0 +1,27 @@
+flowchart LR
+    classDef title fill:#1f2937,color:#ffffff,stroke:#111827,stroke-width:1px;
+    classDef pain fill:#fff4e6,color:#7c2d12,stroke:#fdba74,stroke-width:1px;
+    classDef solution fill:#e0f2fe,color:#0f172a,stroke:#38bdf8,stroke-width:1px;
+    classDef benefit fill:#dcfce7,color:#14532d,stroke:#22c55e,stroke-width:1px;
+
+    T["POS Touchscreen: Faster, Smarter Service"]:::title
+
+    P1["Slow lines"]:::pain
+    P2["Order mistakes"]:::pain
+    P3["Manual tracking"]:::pain
+
+    S["All-in-one POS"]:::solution
+
+    B1["Speed + accuracy"]:::benefit
+    B2["Clear sales insight"]:::benefit
+    B3["Happier guests"]:::benefit
+
+    T --> P1
+    T --> P2
+    T --> P3
+    P1 --> S
+    P2 --> S
+    P3 --> S
+    S --> B1
+    S --> B2
+    S --> B3

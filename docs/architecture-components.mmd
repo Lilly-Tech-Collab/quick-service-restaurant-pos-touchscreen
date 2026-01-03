@@ -1,0 +1,55 @@
+flowchart TB
+    subgraph Client["Desktop Client"]
+        UI["WPF UI (MainWindow)"]
+        VM["View Models/State"]
+    end
+
+    subgraph App["Application Layer"]
+        Auth["Auth Service"]
+        Order["Order Service"]
+        Menu["Menu Service"]
+        Custom["Customization Service"]
+        Payment["Payment Service"]
+        Reports["Report Service"]
+        Settings["Settings Service"]
+    end
+
+    subgraph Domain["Domain Layer"]
+        Entities["Entities (Order, OrderItem, MenuItem)"]
+        Enums["Enums"]
+    end
+
+    subgraph Data["Data Layer"]
+        Db["SQLite DB"]
+        EF["EF Core Context"]
+        Migrations["Migrations/Seed Data"]
+    end
+
+    UI --> VM
+    VM --> Auth
+    VM --> Order
+    VM --> Menu
+    VM --> Custom
+    VM --> Payment
+    VM --> Reports
+    VM --> Settings
+
+    Auth --> Entities
+    Order --> Entities
+    Menu --> Entities
+    Custom --> Entities
+    Payment --> Entities
+    Reports --> Entities
+    Settings --> Entities
+    Entities --> Enums
+
+    Auth --> EF
+    Order --> EF
+    Menu --> EF
+    Custom --> EF
+    Payment --> EF
+    Reports --> EF
+    Settings --> EF
+
+    EF --> Db
+    Migrations --> Db

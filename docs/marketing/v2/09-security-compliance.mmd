@@ -1,0 +1,10 @@
+flowchart TB
+    classDef title fill:#111827,color:#ffffff,stroke:#111827,stroke-width:1px;
+    classDef shield fill:#e0f2fe,color:#0f172a,stroke:#38bdf8,stroke-width:2px;
+    classDef item fill:#f1f5f9,color:#0f172a,stroke:#94a3b8,stroke-width:1px;
+
+    T["Security & Compliance"]:::title --> S["Secure by design"]:::shield
+    S --> A["Role-based access"]:::item
+    S --> L["Audit logs"]:::item
+    S --> P["PCI-aligned payments"]:::item
+    S --> D["Data backups"]:::item

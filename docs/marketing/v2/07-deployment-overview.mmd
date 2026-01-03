@@ -1,0 +1,11 @@
+flowchart LR
+    classDef title fill:#111827,color:#ffffff,stroke:#111827,stroke-width:1px;
+    classDef node fill:#f1f5f9,color:#0f172a,stroke:#94a3b8,stroke-width:1px;
+    classDef core fill:#e0f2fe,color:#0f172a,stroke:#38bdf8,stroke-width:2px;
+
+    T["Deployment at a Glance"]:::title --> POS["POS Touchscreen"]:::core
+    POS --> DB["Local database"]:::node
+    POS --> Printer["Receipt printer"]:::node
+    POS --> Drawer["Cash drawer"]:::node
+    POS --> KDS["Kitchen display"]:::node
+    POS --> Gateway["Payment gateway"]:::node

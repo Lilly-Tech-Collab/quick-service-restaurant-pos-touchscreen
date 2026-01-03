@@ -1,0 +1,32 @@
+flowchart LR
+    ActorCashier((Cashier))
+    ActorManager((Manager))
+    ActorCustomer((Customer))
+
+    subgraph POS[Restaurant POS System]
+        UC1([Take Order])
+        UC2([Customize Items])
+        UC3([Apply Discounts])
+        UC4([Accept Payment])
+        UC5([Print/Show Receipt])
+        UC6([Manage Menu])
+        UC7([Manage Users])
+        UC8([View Reports])
+        UC9([Review Recent Orders])
+    end
+
+    ActorCashier --> UC1
+    ActorCashier --> UC2
+    ActorCashier --> UC3
+    ActorCashier --> UC4
+    ActorCashier --> UC5
+    ActorCashier --> UC9
+
+    ActorManager --> UC6
+    ActorManager --> UC7
+    ActorManager --> UC8
+    ActorManager --> UC9
+
+    ActorCustomer --> UC1
+    ActorCustomer --> UC4
+    ActorCustomer --> UC5

@@ -1,0 +1,14 @@
+flowchart TB
+    classDef title fill:#111827,color:#ffffff,stroke:#111827,stroke-width:1px;
+    classDef basic fill:#fee2e2,color:#7f1d1d,stroke:#ef4444,stroke-width:1px;
+    classDef pos fill:#dbeafe,color:#1e3a8a,stroke:#3b82f6,stroke-width:2px;
+    classDef premium fill:#e5e7eb,color:#111827,stroke:#9ca3af,stroke-width:1px;
+
+    T["Market Positioning"]:::title
+    T --> B["Basic POS (low cost, low power)"]:::basic
+    T --> P["This POS (best value)"]:::pos
+    T --> E["Enterprise POS (high cost)"]:::premium
+
+    B --> B1["Limited features"]
+    P --> P1["Balanced price + features"]
+    E --> E1["Complex setup"]

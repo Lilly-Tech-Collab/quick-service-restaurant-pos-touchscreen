@@ -1,0 +1,27 @@
+flowchart LR
+    classDef before fill:#fee2e2,color:#7f1d1d,stroke:#ef4444,stroke-width:1px;
+    classDef after fill:#dbeafe,color:#1e3a8a,stroke:#3b82f6,stroke-width:1px;
+    classDef outcome fill:#dcfce7,color:#14532d,stroke:#22c55e,stroke-width:1px;
+    classDef title fill:#111827,color:#ffffff,stroke:#111827,stroke-width:1px;
+
+    T["Guest Experience: Before vs After POS"]:::title
+
+    subgraph Before["Before POS"]
+        B1["Manual order taking"]:::before
+        B2["Wait in line"]:::before
+        B3["Incorrect tickets"]:::before
+    end
+
+    subgraph After["After POS"]
+        A1["Tap-to-order"]:::after
+        A2["Fast checkout"]:::after
+        A3["Accurate tickets"]:::after
+    end
+
+    O1["More repeat visits"]:::outcome
+    O2["Higher average ticket"]:::outcome
+
+    T --> B1 --> B2 --> B3
+    T --> A1 --> A2 --> A3
+    A3 --> O1
+    A2 --> O2

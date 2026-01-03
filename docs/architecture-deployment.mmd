@@ -1,0 +1,18 @@
+flowchart LR
+    subgraph Store[Restaurant Location]
+        Terminal[POS Touchscreen\nWindows PC]
+        DB[(SQLite Database)]
+        Printer[Receipt Printer]
+        Drawer[Cash Drawer]
+        KDS[Kitchen Display]
+    end
+
+    Payments[Payment Gateway]
+    BackOffice[Back Office/Reporting]
+
+    Terminal --> DB
+    Terminal --> Printer
+    Terminal --> Drawer
+    Terminal --> KDS
+    Terminal --> Payments
+    Terminal --> BackOffice
