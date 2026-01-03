@@ -215,7 +215,7 @@
                             <TextBlock Grid.Column="2" Text="Qty" FontWeight="Bold" TextAlignment="Right" HorizontalAlignment="Right" Margin="0,0,0,0" />
                             <TextBlock Grid.Column="3" Text="Price" FontWeight="Bold" TextAlignment="Right" HorizontalAlignment="Right" Margin="0,0,8,0" />
                         </Grid>
-                        <ListBox x:Name="TicketItemsList" Grid.Row="1" AlternationCount="10000" SelectionChanged="TicketItemsList_OnSelectionChanged" PreviewMouseLeftButtonUp="TicketItemsList_OnItemTapped" PreviewTouchUp="TicketItemsList_OnItemTouched" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Visible">
+                        <ListBox x:Name="TicketItemsList" Grid.Row="1" SelectionChanged="TicketItemsList_OnSelectionChanged" PreviewMouseLeftButtonUp="TicketItemsList_OnItemTapped" PreviewTouchUp="TicketItemsList_OnItemTouched" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Visible">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <Grid Margin="4">
@@ -230,7 +230,7 @@
                                                 <ColumnDefinition Width="110" SharedSizeGroup="TicketQty" />
                                                 <ColumnDefinition Width="140" SharedSizeGroup="TicketPrice" />
                                             </Grid.ColumnDefinitions>
-                                            <TextBlock Text="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=(ItemsControl.AlternationIndex), Converter={StaticResource OneBasedIndexConverter}}" />
+                                            <TextBlock Text="{Binding DisplayIndex}" />
                                             <TextBlock Grid.Column="1" Text="{Binding NameSnapshot}" FontWeight="SemiBold" />
                                             <TextBlock Grid.Column="2" Text="{Binding Qty}" TextAlignment="Right" Margin="0,0,21,0" />
                                             <TextBlock Grid.Column="3" Text="{Binding LineTotalCents}" TextAlignment="Right" Margin="0,0,31,0" />

@@ -1495,8 +1495,10 @@ public partial class MainWindow : Window
         }
 
         var selectedItemId = _selectedOrderItem?.Id;
+        var displayIndex = 1;
         foreach (var item in order.Items)
         {
+            item.DisplayIndex = displayIndex++;
             TicketItems.Add(item);
         }
 
@@ -1518,6 +1520,7 @@ public partial class MainWindow : Window
         UpdateSelectedOrderCustomizations(_selectedOrderItem);
         UpdateTotalsDisplay(order);
         UpdatePayButtonState(order);
+        ScrollTicketToItem(_selectedOrderItem ?? TicketItems.LastOrDefault());
     }
 
     private void UpdatePayButtonState(Order? order)
@@ -1888,6 +1891,19 @@ public partial class MainWindow : Window
     private static string FormatCents(int cents)
     {
         return string.Format("${0:0.00}", cents / 100.0);
+    }
+
+    private void ScrollTicketToItem(OrderItem? item)
+    {
+        if (item is null)
+        {
+            return;
+        }
+
+        _ = Dispatcher.InvokeAsync(() =>
+        {
+            TicketItemsList.ScrollIntoView(item);
+        });
     }
 
     private void UpdateRoleButtons(UserRole? role)
