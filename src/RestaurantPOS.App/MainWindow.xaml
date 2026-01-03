@@ -455,7 +455,7 @@
                 </Grid>
             </Border>
 
-            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,16">
                 <Button Content="New Order" Width="130" Click="NewOrderButton_OnClick" />
             </StackPanel>
         </Grid>
